@@ -5,10 +5,11 @@
 <!DOCTYPE html>
 <html>
 <head>
-
+<meta charset="ISO-8859-1">
+<title>Item</title>
 </head>
 <body>
-	<%@include file="ShipmentTypeMenu.jsp"%>
+	<%@include file="MenuBar.jsp"%>
 	<div class="container">
 		<div class="card">
 			<div class="card-header">
@@ -129,9 +130,9 @@
 					</div>
 				</form:form>
 			</div>
-			<c:if test="${msg ne null}">
+			<c:if test="${messsg ne null}">
 				<div class="card-footer">
-					<b>${msg}</b>
+					<b>${messsg}</b>
 				</div>
 			</c:if>
 		</div>

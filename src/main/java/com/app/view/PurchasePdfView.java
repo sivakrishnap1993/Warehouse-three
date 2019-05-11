@@ -54,7 +54,7 @@ public class PurchasePdfView extends AbstractPdfView {
 			t.addCell(pp.getQtyCk());
 			t.addCell(pp.getOrdSts());
 			t.addCell(pp.getShip().getShipmentCode());
-			t.addCell(pp.getVenwhuser().getUsrCode());
+			t.addCell(pp.getVenwhuser().getUserCode());
 			t.addCell(pp.getNode());
 		}
 

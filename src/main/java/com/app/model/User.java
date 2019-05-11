@@ -1,63 +1,64 @@
 package com.app.model;
 
-import java.util.List;
+import java.util.Set;
 
+import javax.persistence.Column;
 import javax.persistence.ElementCollection;
 import javax.persistence.Entity;
 import javax.persistence.FetchType;
 import javax.persistence.GeneratedValue;
 import javax.persistence.Id;
+import javax.persistence.JoinColumn;
+import javax.persistence.JoinTable;
+import javax.persistence.OrderColumn;
+import javax.persistence.Table;
 
 @Entity
+@Table(name="user_tab")
 public class User {
 
 	@Id
 	@GeneratedValue
-
-	private Integer useId;
-	private String usrName;
+	@Column(name="uid")
+	private Integer userId;
+	@Column(name="uname")
+	private String userName;
+	@Column(name="gender")
 	private String gender;
-	private String usrMail;
+	@Column(name="email")
+	private String userEmail;
+	@Column(name="mobile")
 	private String userMobile;
-	private String usrPwd;
-	@ElementCollection(fetch = FetchType.EAGER)
-	private List<String> usrRoles;
-
+	@Column(name="pwd")
+	private String userPassword;
+	@ElementCollection(fetch=FetchType.EAGER)
+	@JoinTable(name="user_roles_tab",joinColumns=@JoinColumn(name="uid"))//join column
+	@OrderColumn(name="pos")//index column
+	@Column(name="roles")//colimn name
+	private Set<String> userRoles;
 	public User() {
 		super();
 	}
-
-	public User(Integer useId) {
+	
+	public User(Integer userId) {
 		super();
-		this.useId = useId;
+		this.userId = userId;
 	}
 
-	public User(Integer useId, String usrName, String gender, String usrMail, String userMobile, String usrPwd,
-			List<String> usrRoles) {
-		super();
-		this.useId = useId;
-		this.usrName = usrName;
-		this.gender = gender;
-		this.usrMail = usrMail;
-		this.userMobile = userMobile;
-		this.usrPwd = usrPwd;
-		this.usrRoles = usrRoles;
+	public Integer getUserId() {
+		return userId;
 	}
 
-	public Integer getUseId() {
-		return useId;
+	public void setUserId(Integer userId) {
+		this.userId = userId;
 	}
 
-	public void setUseId(Integer useId) {
-		this.useId = useId;
+	public String getUserName() {
+		return userName;
 	}
 
-	public String getUsrName() {
-		return usrName;
-	}
-
-	public void setUsrName(String usrName) {
-		this.usrName = usrName;
+	public void setUserName(String userName) {
+		this.userName = userName;
 	}
 
 	public String getGender() {
@@ -68,12 +69,12 @@ public class User {
 		this.gender = gender;
 	}
 
-	public String getUsrMail() {
-		return usrMail;
+	public String getUserEmail() {
+		return userEmail;
 	}
 
-	public void setUsrMail(String usrMail) {
-		this.usrMail = usrMail;
+	public void setUserEmail(String userEmail) {
+		this.userEmail = userEmail;
 	}
 
 	public String getUserMobile() {
@@ -84,26 +85,28 @@ public class User {
 		this.userMobile = userMobile;
 	}
 
-	public String getUsrPwd() {
-		return usrPwd;
+	public String getUserPassword() {
+		return userPassword;
 	}
 
-	public void setUsrPwd(String usrPwd) {
-		this.usrPwd = usrPwd;
+	public void setUserPassword(String userPassword) {
+		this.userPassword = userPassword;
 	}
 
-	public List<String> getUsrRoles() {
-		return usrRoles;
+	public Set<String> getUserRoles() {
+		return userRoles;
 	}
 
-	public void setUsrRoles(List<String> usrRoles) {
-		this.usrRoles = usrRoles;
+	public void setUserRoles(Set<String> userRoles) {
+		this.userRoles = userRoles;
 	}
 
 	@Override
 	public String toString() {
-		return "User [useId=" + useId + ", usrName=" + usrName + ", gender=" + gender + ", usrMail=" + usrMail
-				+ ", userMobile=" + userMobile + ", usrPwd=" + usrPwd + ", usrRoles=" + usrRoles + "]";
+		return "User [userId=" + userId + ", userName=" + userName + ", gender=" + gender + ", userEmail=" + userEmail
+				+ ", userMobile=" + userMobile + ", userPassword=" + userPassword + ", userRoles=" + userRoles + "]";
 	}
 
+	
+	
 }

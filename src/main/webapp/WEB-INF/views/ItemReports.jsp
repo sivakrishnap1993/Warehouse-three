@@ -7,7 +7,7 @@
 <title>Insert title here</title>
 </head>
 <body>
-	<%@include file="ShipmentTypeMenu.jsp"%>
+	<%@include file="MenuBar.jsp"%>
 	<div class="container">
 		<div class="card">
 			<div class="card-header"></div>

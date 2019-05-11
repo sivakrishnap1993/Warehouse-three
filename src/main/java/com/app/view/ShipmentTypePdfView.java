@@ -46,12 +46,12 @@ public class ShipmentTypePdfView extends AbstractPdfView {
 
 		// add Data to Table
 		for (ShipmentType u : lst) {
-			t.addCell(u.getShipmentId().toString());
+			t.addCell(u.getShipmentid().toString());
 			t.addCell(u.getShipmentMode());
 			t.addCell(u.getShipmentCode());
 			t.addCell(u.getEnableShipment());
 			t.addCell(u.getShipmentGrade());
-			t.addCell(u.getNote());
+			t.addCell(u.getShipDesc());
 
 		}
 		document.add(t);

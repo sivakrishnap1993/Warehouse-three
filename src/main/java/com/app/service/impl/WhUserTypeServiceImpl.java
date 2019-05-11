@@ -12,60 +12,54 @@ import com.app.model.WhUserType;
 import com.app.service.IWhUserTypeService;
 
 @Service
-public class WhUserTypeServiceImpl implements IWhUserTypeService {
+public class WhUserTypeServiceImpl implements IWhUserTypeService{
 
 	@Autowired
 	private IWhUserTypeDao dao;
-
+	
 	@Transactional
-	public Integer saveWhUserType(WhUserType wh) {
-		return dao.saveWhUserType(wh);
-	}
-
-	@Transactional
-	public void updateWhUserType(WhUserType wh) {
-		dao.updateWhUserType(wh);
+	public Integer saveWhUserType(WhUserType whUserType) {
+		return dao.saveWhUserType(whUserType);
 	}
 
 	@Transactional
-	public void deleteWhUserType(Integer id) {
-		dao.deleteWhUserType(id);
+	public void updateWhUserType(WhUserType whUserType) {
+		dao.updateWhUserType(whUserType);
 	}
 
-	@Transactional(readOnly = true)
-	public WhUserType getWhUserTypeById(Integer id) {
-		return dao.getWhUserTypeById(id);
+	@Transactional
+	public void deleteWhUserType(Integer whUserTypeId) {
+		dao.deleteWhUserType(whUserTypeId);
 	}
 
-	@Transactional(readOnly = true)
+	@Transactional(readOnly=true)
+	public WhUserType getWhUserTypeById(Integer whUserTypeId) {
+		return dao.getWhUserTypeById(whUserTypeId);
+	}
+
+	@Transactional(readOnly=true)
 	public List<WhUserType> getAllWhUserTypes() {
 		return dao.getAllWhUserTypes();
 	}
 
-	@Transactional(readOnly = true)
-	public List<Object[]> getWhUserTypeCountByMode() {
-		return dao.getWhUserTypeCountByMode();
+	@Transactional(readOnly=true)
+	public List<Object[]> getWhUserTypeCount() {
+		
+		return dao.getWhUserTypeCount();
 	}
 
-	@Transactional(readOnly = true)
-	public List<WhUserType> getWhUsersBasedonType(String type) {
-		// TODO Auto-generated method stub
-		return dao.getWhUsersBasedonType(type);
-	}
-
-	@Transactional(readOnly = true)
+	@Transactional(readOnly=true)
 	public boolean isWhUserCodeExist(String userCode) {
 		return dao.isWhUserCodeExist(userCode);
 	}
 
-	@Transactional(readOnly = true)
+	@Transactional(readOnly=true)
 	public Map<Integer, String> getAllWhUserByType(String userType) {
 		return dao.getAllWhUserByType(userType);
 	}
 
-	@Transactional(readOnly = true)
+	@Transactional(readOnly=true)
 	public boolean isEmailOrMobileExist(String type, String userEmailOrmobile) {
 		return dao.isEmailOrMobileExist(type, userEmailOrmobile);
 	}
-
 }

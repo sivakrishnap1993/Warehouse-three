@@ -6,7 +6,7 @@
 <html>
 <head>
 <meta http-equiv="Content-Type" content="text/html; charset=ISO-8859-1">
-<title>Login Page</title>
+<title>Insert title here</title>
 </head>
 <body>
 	<%@include file="HomeMenu.jsp"%>

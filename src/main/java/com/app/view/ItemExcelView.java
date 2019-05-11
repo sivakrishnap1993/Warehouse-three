@@ -39,8 +39,10 @@ public class ItemExcelView extends AbstractXlsxView {
 		r.createCell(4).setCellValue("WEIGHT");
 		r.createCell(5).setCellValue("UOM");
 		r.createCell(6).setCellValue("ORDERMETHOD");
-		r.createCell(7).setCellValue("VENDOR");
-		r.createCell(8).setCellValue("CUSTOMER");
+		/*
+		 * r.createCell(7).setCellValue("VENDOR");
+		 * r.createCell(8).setCellValue("CUSTOMER");
+		 */
 		r.createCell(9).setCellValue("COST");
 		r.createCell(10).setCellValue("CURRENCY");
 		r.createCell(11).setCellValue("NOTE");
@@ -51,17 +53,19 @@ public class ItemExcelView extends AbstractXlsxView {
 		for (Item i : list) {
 			Row r = sheet.createRow(rowId++);
 			r.createCell(0).setCellValue(i.getItemId());
-			r.createCell(1).setCellValue(i.getItmCode());
+			r.createCell(1).setCellValue(i.getItemCode());
 			r.createCell(2).setCellValue(i.getItemHeight());
 			r.createCell(3).setCellValue(i.getItemLength());
-			r.createCell(4).setCellValue(i.getItmWidth());
-			r.createCell(5).setCellValue(i.getUom().getUomEnable());
-			r.createCell(6).setCellValue(i.getOm().getOrdMode());
-			r.createCell(7).setCellValue(i.getWuven().getUsrCode());
-			r.createCell(8).setCellValue(i.getWucust().getUsrCode());
-			r.createCell(9).setCellValue(i.getBaseCost());
-			r.createCell(10).setCellValue(i.getBaseCurrency());
-			r.createCell(11).setCellValue(i.getNote());
+			r.createCell(4).setCellValue(i.getItemWidth());
+			/* r.createCell(5).setCellValue(i.getUom().getUomEnable()); */
+			r.createCell(6).setCellValue(i.getOrderMethod().getOrderMode());
+			/*
+			 * r.createCell(7).setCellValue(i.getWuven().getUsrCode());
+			 * r.createCell(8).setCellValue(i.getWucust().getUsrCode());
+			 */
+			r.createCell(9).setCellValue(i.getItemBaseCost());
+			r.createCell(10).setCellValue(i.getItemCurrentCurrency());
+			r.createCell(11).setCellValue(i.getItemDesc());
 		}
 	}
 

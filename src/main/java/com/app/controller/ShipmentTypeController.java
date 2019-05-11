@@ -1,6 +1,6 @@
 package com.app.controller;
 
-import java.util.Collections;
+import java.util.Arrays;
 import java.util.List;
 
 import javax.servlet.ServletContext;
@@ -18,7 +18,7 @@ import org.springframework.web.servlet.ModelAndView;
 import com.app.model.ShipmentType;
 import com.app.service.IShipmentTypeService;
 import com.app.util.ShipmentTypeUtil;
-import com.app.validator.ShipmentTypeValidaor;
+import com.app.validator.ShipmentTypeValidator;
 import com.app.view.ShipmentTypeExcelView;
 import com.app.view.ShipmentTypePdfView;
 
@@ -28,120 +28,213 @@ public class ShipmentTypeController {
 
 	@Autowired
 	private IShipmentTypeService service;
-
 	@Autowired
-	private ServletContext context;
-
+	private ServletContext servletContex;
 	@Autowired
 	private ShipmentTypeUtil util;
-
 	@Autowired
-	private ShipmentTypeValidaor validator;
+	private ShipmentTypeValidator validator;
 
-	// 1.Show Page
+	// 1.Show Register Page
 	@RequestMapping("/register")
-	public String showRegisterPage(ModelMap map) {
+	public String showReg(ModelMap map) {
 		map.addAttribute("shipmentType", new ShipmentType());
-		return "ShipRegisterPage";
+		return "ShipmentTypeRegister";
 	}
 
-	// 2.This Method Will Be called on Submit
-	@RequestMapping(value = "/save", method = RequestMethod.POST)
-	public String saveShipment(@ModelAttribute ShipmentType shipmentType, Errors errors, ModelMap mp) {
-		// CALL VALIDATOR
+	// 2.Insert Data in DB
+	@RequestMapping(value="/insert",method=RequestMethod.POST)
+	public String save(@ModelAttribute ShipmentType shipmentType,Errors errors,ModelMap map) {
+
 		validator.validate(shipmentType, errors);
-		if (!errors.hasErrors()) {
-			// CALL SERVICE LAYER
-			Integer id = service.saveShipmentType(shipmentType);
-			mp.addAttribute("msg", "Shipment  '" + id + "' Saved Successfully");
-			// CLEAR FORM BACKING OBJECT
-			mp.addAttribute("shipmentType", new ShipmentType());
-
+		if (errors.hasErrors()) {
+			map.addAttribute("message", "Please fill all fields!");
 		} else {
-			mp.addAttribute("msg", "Please Check Errors");
+
+			map.addAttribute("message", "Shipment saved with Id :"+service.saveShipmentType(shipmentType));
+			map.addAttribute("shipmentType", new ShipmentType());
+			/*int id = service.saveShipmentType(shipmentType);
+			String msg = "Shipment saved with Id:"+id;
+			map.addAttribute("message",msg);
+			map.addAttribute("shipmentType", new ShipmentType());*/
 		}
-		return "ShipRegisterPage";
+		return "ShipmentTypeRegister";
+
 	}
 
-	// 3.Show Data
-
-	@RequestMapping("/all")
-	public String showAll(ModelMap map) {
-		List<ShipmentType> oss = service.getAllShipmentTypes();
-		map.addAttribute("list", oss);
-		return "ShipShowDataPage";
+	/*// 3.View All Records
+	@RequestMapping("/viewAll")
+	public String vewAll(ModelMap map) {
+		List<ShipmentType> shipmentType=service.getAllShipmentTypes();
+		map.addAttribute("shipmentType", shipmentType);
+		return "ShipmentTypeData";
 	}
-
-	// 4.Delete
+	 */
+	
+	// 4.Delete Record
 	@RequestMapping("/delete")
-	public String deleteDataById(@RequestParam("id") Integer sid, ModelMap map) {
-		service.deleteShipmentType(sid);
-		map.addAttribute("list", service.getAllShipmentTypes());
-		map.addAttribute("msg", sid + "Deleted Successfully");
-		return "ShipShowDataPage";
-	}
-
-	// 5 To Show Edit Page
-	@RequestMapping("/edit")
-	public String showEdit(@RequestParam("id") Integer sid, ModelMap map) {
-		ShipmentType sh = service.getShipmentById(sid);
-		map.addAttribute("shipmentType", sh);
-		return "ShipShowEditPage";
-	}
-
-	// 6 To Update Form Data on Click Submit
-	@RequestMapping(value = "/update", method = RequestMethod.POST)
-	public String updatePage(@ModelAttribute ShipmentType shipmentType, ModelMap map) {
-		service.updateShipementType(shipmentType);
-		List<ShipmentType> lts = service.getAllShipmentTypes();
-		map.addAttribute("list", lts);
-		return "ShipShowDataPage";
-	}
-
-	// 7.EXPORT TO EXCEL
-	@RequestMapping("/excel")
-	public ModelAndView excelExportPage(@RequestParam(value = "id", required = false, defaultValue = "0") Integer id) {
-		ModelAndView m = new ModelAndView();
-		m.setView(new ShipmentTypeExcelView());
-		if (id == 0) {
-			m.addObject("list", service.getAllShipmentTypes());
-		} else {
-			m.addObject("list", Collections.singletonList(service.getShipmentById(id)));
+	public String delete(@RequestParam Integer shipmentId,ModelMap map) {
+		
+		try {
+			//delete row
+			service.deleteShipmentType(shipmentId);
+			map.addAttribute("message", "One Shipment Details are deleted with Id : "+shipmentId);
+		} catch (Exception e) {
+			map.addAttribute("message", "Shipment Details are not found with Id : "+shipmentId);
 		}
-		return m;
+
+		//read data
+		List<ShipmentType> shipmentType=service.getAllShipmentTypes();
+		//add data to ui
+		map.addAttribute("shipmentType", shipmentType);
+		return "ShipmentTypeData";	
 	}
 
-	// 8. Export To Pdf
-	@RequestMapping("/pdf")
-	public ModelAndView pdfExport(@RequestParam(value = "id", required = false, defaultValue = "0") Integer id) {
-		ModelAndView mm = new ModelAndView();
-		mm.setView(new ShipmentTypePdfView());
-		if (id == 0) {
-			mm.addObject("list", service.getAllShipmentTypes());
-		} else {
-			ShipmentType s = service.getShipmentById(id);
-			mm.addObject("list", Collections.singletonList(s));
-		}
-		return mm;
-	}
-
-	// 9.SHOW PI & BAR CHARTS
-	@RequestMapping("/charts")
-	public String showCharts() {
-		String path = context.getRealPath("/");
-		List<Object[]> list = service.getShipmentCountByMode();
-		System.out.println(path);
-		util.generatePie(path, list);
-		util.generatePie(path, list);
-		return "ShipmentTypeReports";
-	}
-
-	// 10.VIEW ONE ROW DATA
+	/*// 5.view one row or object
 	@RequestMapping("/viewOne")
-	public String getOneRow(@RequestParam Integer id, ModelMap map) {
-		ShipmentType st = service.getShipmentById(id);
-		map.addAttribute("st", st);
-		return "ShipmentViewPage";
+	public String viewOneObject(@RequestParam Integer shipmentId,ModelMap map) {
+		//call service to get details based on id and send to ui
+
+		map.addAttribute("shipmentType", service.getShipmentTypeById(shipmentId));
+
+
+		return "ShipmentTypeView";
+	}*/
+	// 5.view one row or object
+	@RequestMapping("/view")
+	public String view(@RequestParam(required=false,defaultValue="0") Integer shipmentId,ModelMap map) {
+
+		String page=null;
+
+		if (shipmentId!=0) {
+			//call service to get details based on id and send to ui
+			map.addAttribute("shipmentType", service.getShipmentTypeById(shipmentId));
+			page = "ShipmentTypeView";
+		} else {
+			map.addAttribute("shipmentType", service.getAllShipmentTypes());
+			page = "ShipmentTypeData";
+		}
+
+
+		return page;
 	}
+
+	// 6.show edit page
+	@RequestMapping("/editOne")
+	public String showEdit(@RequestParam Integer shipmentId,ModelMap map) {
+
+		//load db row as object and send data to ui
+		map.addAttribute("shipmentType", service.getShipmentTypeById(shipmentId));
+
+		return "ShipmentTypeEdit";
+	}
+
+	//7.Do update
+	@RequestMapping(value="/update",method=RequestMethod.POST)
+	public String doUpdate(@ModelAttribute ShipmentType shipmentType,ModelMap map) {
+
+		//call service to do update
+		service.updateShipmentType(shipmentType);
+
+		//success message
+		map.addAttribute("message", "Shipment is successfully updated");
+
+		//get new Data and send to ui
+		map.addAttribute("shipmentType", service.getAllShipmentTypes());
+
+		//return data.jsp
+		return "ShipmentTypeData";
+	}
+
+	/*//8. Export Data to Excel 
+	@RequestMapping("/excelExp") 
+	public ModelAndView doExcelExport() {   
+		//reading data from DB
+		List<ShipmentType> shipmentType=service.getAllShipmentTypes();
+		//view, key,val
+
+		ModelAndView m=new ModelAndView();
+		ShipmentTypeExcelView st=new ShipmentTypeExcelView();
+		m.setView(st);
+		m.addObject("shipmentType", shipmentType);
+		return m;
+
+		return new ModelAndView(new ShipmentTypeExcelView(),"shipmentType", shipmentType); 
+	} 
+
+	//9. Export Data to Excel 
+	@RequestMapping("/exportExcelOne")  
+	public ModelAndView doOneExcelExport(@RequestParam Integer shipmentId) {   
+		//reading data from DB   
+		ShipmentType shipmentType=service.getShipmentTypeById(shipmentId);   
+		//view, key,val   
+		return new ModelAndView(new ShipmentTypeExcelView(),"shipmentType", Arrays.asList(shipmentType)); 
+	}*/
+
+	// 8. Export Data to Excel 
+	@RequestMapping("/excelExport")  
+	public ModelAndView doOneExcelExport(@RequestParam(required=false,defaultValue="0") Integer shipmentId) {   
+		if (shipmentId!=0) {
+			return new ModelAndView(new ShipmentTypeExcelView(),"shipmentType",Arrays.asList(service.getShipmentTypeById(shipmentId)));
+		} else {
+			return new ModelAndView(new ShipmentTypeExcelView(),"shipmentType",service.getAllShipmentTypes());
+		}
+
+	}
+
+	/*//10. Export all rows to pdf
+	@RequestMapping("/pdfExp")
+	public ModelAndView exportPdf() {
+
+		return new ModelAndView(new ShipmentTypePdfView(),"shipmentType",service.getAllShipmentTypes());
+
+	}
+
+	//11.export one row as pdf
+	@RequestMapping("/exportPdfOne")
+	public ModelAndView exportOnePdf(@RequestParam Integer shipmentId) {
+
+		return new ModelAndView(new ShipmentTypePdfView(),"shipmentType",Arrays.asList(service.getShipmentTypeById(shipmentId)));
+
+
+	}*/
+
+	// 9.export pdf
+	@RequestMapping("/pdfExport")
+	public ModelAndView exportPdf(@RequestParam(required=false,defaultValue="0") Integer shipmentId) {
+
+		if (shipmentId!=0) {
+
+			return new ModelAndView(new ShipmentTypePdfView(),"shipmentType",Arrays.asList(service.getShipmentTypeById(shipmentId)));
+		} else {
+
+			return new ModelAndView(new ShipmentTypePdfView(),"shipmentType",service.getAllShipmentTypes());
+		}
+
+	}
+
+	//10.generate pie chart
+	@RequestMapping("/report")
+	public String generatePieChart() {
+
+		String path=servletContex.getRealPath("/");
+		List<Object[]> shipmentTypes=service.getShipmentTypeCount();
+		util.generatePie(path, shipmentTypes);
+		util.generatePie(path, shipmentTypes);
+		return "ShipmentTypeReport";
+	}
+
+
+
+
+
+
+
+
+
+
+
+
+
 
 }

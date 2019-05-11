@@ -49,12 +49,12 @@ public class OrderMethodExcelView extends AbstractXlsView {
 		int rowId = 1;
 		for (OrderMethod s : list) {
 			Row r = sheet.createRow(rowId++);
-			r.createCell(0).setCellValue(s.getOrdMId().toString());
-			r.createCell(1).setCellValue(s.getOrdMode());
-			r.createCell(2).setCellValue(s.getOrdCode());
-			r.createCell(3).setCellValue(s.getOrdExType());
-			r.createCell(4).setCellValue(s.getOrdAccept().toString());
-			r.createCell(5).setCellValue(s.getNote());
+			r.createCell(0).setCellValue(s.getOrderId().toString());
+			r.createCell(1).setCellValue(s.getOrderMode());
+			r.createCell(2).setCellValue(s.getOrderCode());
+			r.createCell(3).setCellValue(s.getOrderExeType());
+			r.createCell(4).setCellValue(s.getOrderAccept().toString());
+			r.createCell(5).setCellValue(s.getOrderDecs());
 
 		}
 	}

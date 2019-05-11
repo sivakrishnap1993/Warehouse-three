@@ -1,6 +1,6 @@
 package com.app.controller;
 
-import java.util.Collections;
+import java.util.Arrays;
 import java.util.List;
 
 import javax.servlet.ServletContext;
@@ -28,120 +28,171 @@ public class UomController {
 
 	@Autowired
 	private IUomService service;
-
 	@Autowired
-	private ServletContext context;
-
+	private ServletContext servletContext;
 	@Autowired
 	private UomUtil util;
-
 	@Autowired
-	private UomValidator validatior;
+	private UomValidator validator;
 
-	// 1.Show Data
+	// 1.Show Register page
 	@RequestMapping("/register")
-	public String showPage(ModelMap map) {
-		map.addAttribute("uom", new Uom());
-		return "UomShowPage";
+	public String show(ModelMap map) {
+		map.addAttribute("uom",new Uom());
+		return "UomRegister";
 	}
 
-	// 2.Save Data To Db
-	@RequestMapping("/save")
-	public String updatePage(@ModelAttribute Uom uom, Errors errors, ModelMap map) {
+	// 2. Insert uom Data
+	@RequestMapping(value="/insert",method=RequestMethod.POST)
+	public String save(@ModelAttribute Uom uom,Errors errors,ModelMap map) {
 
-		// CALL VALIDATOR
-		validatior.validate(uom, errors);
+		validator.validate(uom, errors);
 
-		if (!errors.hasErrors()) {
-			Integer id = service.saveUom(uom);
-			map.addAttribute("message", "Uom Page '" + id + "' Saved Successfull");
+		if (errors.hasErrors()) {
+			map.addAttribute("message", "Please check all fields");
+		} else {
+			map.addAttribute("message", "Uom saved with Id : "+service.saveUom(uom));
 			map.addAttribute("uom", new Uom());
-		} else {
-			map.addAttribute("message", "Please Check Errors");
 		}
-		return "UomShowPage";
+		
+		return "UomRegister";
 	}
 
-	// 3.Show All Data Pages
-	@RequestMapping("/all")
-	public String showAllPages(ModelMap map) {
-		List<Uom> ls = service.getAllUoms();
-		map.addAttribute("list", ls);
-		return "UomDataPage";
-	}
+	/*// 3. View All Records
 
-	// 4.Delete Page
+	@RequestMapping("/viewAll")
+	public String viewAll(ModelMap map) {
+
+		List<Uom> allUoms = service.getAllUoms();
+		map.addAttribute("allUoms", allUoms);
+		return "UomData";
+	}*/
+
+	// 4. Delete Record by Id
 	@RequestMapping("/delete")
-	public String deleteDataById(@RequestParam Integer id, ModelMap map) {
-		service.deleteUom(id);
-		map.addAttribute("msg", id + "Deleted Successfully");
-		map.addAttribute("list", service.getAllUoms());
-		return "UomDataPage";
+	public String delete(@RequestParam Integer uomId,ModelMap map) {
+		
+		try {
+			// delete row
+			service.deleteUom(uomId);
+			map.addAttribute("message", "One Uom details with "+uomId+" are deleted");
+		} catch (Exception e) {
+			map.addAttribute("message", "No details found with Id : "+uomId);
+		}
+
+		//load  data
+		List<Uom> allUoms = service.getAllUoms();
+		//send data to ui
+		map.addAttribute("uom", allUoms);
+		return "UomData";
 	}
 
-	// 5.EDIT PAGE
-	@RequestMapping("/edit")
-	public String showEdit(@RequestParam("id") Integer sid, ModelMap map) {
-		Uom sh = service.getUomById(sid);
-		map.addAttribute("uom", sh);
-		return "UomEditPage";
+	@RequestMapping("/view")
+	public String viewOne(@RequestParam(required=false,defaultValue="0") Integer uomId,ModelMap map) {
+
+		String page=null;
+		if (uomId!=0) {
+			// load one user data and send to UI
+			map.addAttribute("uom", service.getUomById(uomId));
+			page = "UomView";
+
+		} else {
+			// load one user data and send to UI
+			map.addAttribute("uom", service.getAllUoms());
+			page = "UomData";
+		}
+
+		return page;
 	}
 
-	// 6. UPDATE PAGE
-	@RequestMapping(value = "/update", method = RequestMethod.POST)
-	public String update(@ModelAttribute Uom uom, ModelMap map) {
+
+	// 6.Show edit page
+	@RequestMapping("/editOne")
+	public String showEdit(@RequestParam Integer uomId,ModelMap map) {
+		//get one object and send to ui
+		map.addAttribute("uom", service.getUomById(uomId));
+		return "UomEdit";
+	}
+
+	// 7.Do update
+	@RequestMapping(value="/update",method=RequestMethod.POST)
+	public String doUpdate(@ModelAttribute Uom uom,ModelMap map) {
+
 		service.updateUom(uom);
-		List<Uom> u = service.getAllUoms();
-		map.addAttribute("list", u);
+		map.addAttribute("message", "Uom is successfully updated");
+		map.addAttribute("uom", service.getAllUoms());
 
-		return "UomDataPage";
+		return "UomData";
 	}
 
-	// 7.EXPORT TO EXCEL
-	@RequestMapping("/excel")
-	public ModelAndView excelExportPage(@RequestParam(value = "id", required = false, defaultValue = "0") Integer id) {
-		ModelAndView m = new ModelAndView();
-		m.setView(new UomExcelView());
-		if (id == 0) {
-			m.addObject("list", service.getAllUoms());
+	/*// 8.do excell export
+	@RequestMapping("/excelExp")
+	public ModelAndView doExcelExport() {
+
+		// load all rows from db
+		List<Uom> uom= service.getAllUoms();
+		//set vie,key&val
+		return new ModelAndView(new UomExcelView(),"uom",uom);
+	}
+
+	// 9.do one row excell export
+	@RequestMapping("/exportExcelOne")
+	public ModelAndView doExcelExportOne(@RequestParam Integer uomId) {
+
+		// load all rows from db
+		Uom uom= service.getUomById(uomId);
+
+		// set view ,key&val
+
+		return new ModelAndView(new UomExcelView(),"uom",Arrays.asList(uom));
+	}*/
+
+	// 8.excel export
+	@RequestMapping("/excelExport")
+	public ModelAndView excelExport(@RequestParam(required=false,defaultValue="0") Integer uomId) {
+
+		if (uomId!=0) {
+
+			return new ModelAndView(new UomExcelView(),"uom",Arrays.asList(service.getUomById(uomId)));
 		} else {
-			m.addObject("list", Collections.singletonList(service.getUomById(id)));
+
+			return new ModelAndView(new UomExcelView(),"uom",service.getAllUoms());
 		}
-		return m;
 	}
 
-	// 8. EXPORT DATA TO PDF FORM
-	@RequestMapping("/pdf")
-	public ModelAndView pdfExport(@RequestParam(value = "id", required = false, defaultValue = "0") Integer id) {
-		ModelAndView m = new ModelAndView();
-		// set view object
-		m.setView(new UomPdfView());
-		if (id == 0) {
-			m.addObject("list", service.getAllUoms());
+	/*//10. export all rows to pdf
+	@RequestMapping("/pdfExport")
+	public ModelAndView doPdfExport() {
+		return new ModelAndView(new UomPdfView(),"uom",service.getAllUoms());
+	}
+
+	//11.export all rows to pdf
+	@RequestMapping("/exportPdfOne")
+	public ModelAndView doOnePdfExport(@RequestParam Integer uomId) {
+	}*/
+
+	// 9. Pdf export
+	@RequestMapping("/pdfExport")
+	public ModelAndView pdfExport(@RequestParam(required=false,defaultValue="0") Integer uomId) {
+
+		if (uomId!=0) {
+
+			return new ModelAndView(new UomPdfView(),"uom",Arrays.asList(service.getUomById(uomId)));
 		} else {
-			Uom u = service.getUomById(id);
-			m.addObject("list", Collections.singletonList(u));
+
+			return new ModelAndView(new UomPdfView(),"uom",service.getAllUoms());
 		}
-		return m;
 	}
 
-	// 9. Pi Charts
-	@RequestMapping("/charts")
-	public String showCharts() {
-		String path = context.getRealPath("/");
-		List<Object[]> list = service.getUomCountByType();
-		System.out.println(path);
-		util.generatePie(path, list);
-		util.generatePie(path, list);
-		return "UomChartPage";
-	}
+	//10.generate charts
+	@RequestMapping("/report")
+	public String generateCharts() {
 
-	// 10.GET ROW NUMBER
-	@RequestMapping("/viewOne")
-	public String getRowNum(@RequestParam Integer id, ModelMap map) {
-		Uom u = service.getUomById(id);
-		map.addAttribute("us", u);
-		return "UomViewPage";
+		String path = servletContext.getRealPath("/");
+		List<Object[]> uomTypes = service.getuomTypeCount();
+		util.generatePieChart(path, uomTypes);
+		util.generateBarChart(path, uomTypes);
+		return "UomReport";
 	}
 
 }

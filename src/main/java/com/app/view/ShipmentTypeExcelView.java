@@ -51,12 +51,12 @@ public class ShipmentTypeExcelView  extends AbstractXlsView{
 				int rowId = 1;
 				for (ShipmentType s : list) {
 					Row r = sheet.createRow(rowId++);
-					r.createCell(0).setCellValue(s.getShipmentId());
+					r.createCell(0).setCellValue(s.getShipmentid());
 					r.createCell(1).setCellValue(s.getShipmentMode());
 					r.createCell(2).setCellValue(s.getShipmentCode());
 					r.createCell(3).setCellValue(s.getEnableShipment());
 					r.createCell(4).setCellValue(s.getShipmentGrade());
-					r.createCell(5).setCellValue(s.getNote());
+					r.createCell(5).setCellValue(s.getShipDesc());
 					
 				}
 			}

@@ -43,8 +43,9 @@ public class ItemPdfView  extends AbstractPdfView{
 	t.addCell("WEIGHT");
 	t.addCell("UOM");
 	t.addCell("ORDERMETHOD");
-	t.addCell("VENDOR");
-	t.addCell("CUSTOMER");
+		/*
+		 * t.addCell("VENDOR"); t.addCell("CUSTOMER");
+		 */
 	t.addCell("COST");
 	t.addCell("CURRENCY");
 	t.addCell("NOTE");
@@ -52,17 +53,18 @@ public class ItemPdfView  extends AbstractPdfView{
 	// add Data to Table
 	for (Item u : lst) {
 		t.addCell(u.getItemId().toString());
-		t.addCell(u.getItmCode());
+		t.addCell(u.getItemCode());
 		t.addCell(u.getItemHeight().toString());
 		t.addCell(u.getItemLength().toString());
-		t.addCell(u.getItmWidth().toString());
-		t.addCell(u.getUom().getUomEnable());
-		t.addCell(u.getOm().getOrdMode());
-		t.addCell(u.getWuven().getUsrCode());
-		t.addCell(u.getWucust().getUsrCode());
-		t.addCell(u.getBaseCost());
-		t.addCell(u.getBaseCurrency());
-		t.addCell(u.getNote());
+		t.addCell(u.getItemWidth().toString());
+			/* t.addCell(u.getUom().getUomEnable()); */
+		t.addCell(u.getOrderMethod().getOrderMode());
+			/*
+			 * t.addCell(u.getWuven().getUsrCode()); t.addCell(u.getWucust().getUsrCode());
+			 */
+		t.addCell(u.getItemBaseCost().toString());
+		t.addCell(u.getItemCurrentCurrency());
+		t.addCell(u.getItemDesc());
 
 	}
 	

@@ -1,9 +1,8 @@
 package com.app.controller;
 
-import java.util.Collections;
+import java.util.Arrays;
 import java.util.List;
-
-import javax.servlet.ServletContext;
+import java.util.Map;
 
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Controller;
@@ -16,142 +15,246 @@ import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.servlet.ModelAndView;
 
 import com.app.model.Purchase;
+import com.app.model.PurchaseDtl;
+import com.app.service.IItemService;
 import com.app.service.IPurchaseService;
 import com.app.service.IShipmentTypeService;
 import com.app.service.IWhUserTypeService;
-import com.app.util.PurchaseUtil;
 import com.app.validator.PurchaseValidator;
 import com.app.view.PurchaseExcelView;
 import com.app.view.PurchasePdfView;
+import com.app.view.VendorInvoicePdfView;
 
 @Controller
 @RequestMapping("/purchase")
 public class PurchaseController {
 
 	@Autowired
-	private IPurchaseService service;
-
+	private IPurchaseService purchaseService;
 	@Autowired
-	private ServletContext context;
+	private IWhUserTypeService whUserTypeService;
 	@Autowired
-	private PurchaseUtil util;
-
+	private IShipmentTypeService shipmentTypeService;
 	@Autowired
 	private PurchaseValidator validator;
-	
 	@Autowired
-	private IShipmentTypeService shipmentservice;
-	
-	@Autowired
-	private IWhUserTypeService whuservice;
+	private IItemService itemService;
 
-	@RequestMapping("/show")
-	public String showPage(ModelMap map) {
+	@RequestMapping("/register")
+	public String showRegister(ModelMap map) {
 		map.addAttribute("purchase", new Purchase());
-		/**INTEGRATION STARTS**/
-		map.addAttribute("ships", shipmentservice.getAllShipmentTypes());
-		map.addAttribute("whusers", whuservice.getAllWhUserTypes());
-		/**INTEGRATION STARTS**/
-		return "PurchaseShowPage";
+		map.addAttribute("whUserType", whUserTypeService.getAllWhUserByType("VENDOR"));
+		map.addAttribute("shipmentType", shipmentTypeService.getEnableShipmentIdsAndCodes());
+		return "PurchaseRegister";
 	}
 
-	@RequestMapping(value = "/save", method = RequestMethod.POST)
-	public String showRegPage(@ModelAttribute Purchase purchase, Errors errors, ModelMap map) {
+	@RequestMapping(value = "/insert", method = RequestMethod.POST)
+	public String savePurchase(@ModelAttribute Purchase purchase, Errors errors, ModelMap map) {
 
-		// CALL VALIDATIONS
 		validator.validate(purchase, errors);
-		if (!errors.hasErrors()) {
-			Integer id = service.savePurchase(purchase);
-			map.addAttribute("msg", "Purchase '" + id + "' Saved Successfully");
-			map.addAttribute("purchase", new Purchase());
-			/**INTEGRATION STARTS**/
-			map.addAttribute("ships", shipmentservice.getAllShipmentTypes());
-			map.addAttribute("whusers", whuservice.getAllWhUserTypes());
-			/**INTEGRATION STARTS**/
+
+		if (errors.hasErrors()) {
+			map.addAttribute("message", "please check all fields !!");
 
 		} else {
-			map.addAttribute("msg", "Please Check Error");
+			map.addAttribute("message", "Purchase is saved with Id :" + purchaseService.savePurchase(purchase));
+			map.addAttribute("purchase", new Purchase());
+		}
+		map.addAttribute("whUserType", whUserTypeService.getAllWhUserByType("VENDOR"));
+		map.addAttribute("shipmentType", shipmentTypeService.getEnableShipmentIdsAndCodes());
+		return "PurchaseRegister";
+	}
+
+	/*
+	 * @RequestMapping("/viewAll") public String viewAll(ModelMap map) {
+	 * 
+	 * map.addAttribute("purchase", purchaseService.getAllPurchases()); return
+	 * "PurchaseData"; }
+	 */
+
+	@RequestMapping("/view")
+	public String viewOne(@RequestParam(required = false, defaultValue = "0") Integer orderId, ModelMap map) {
+
+		String page = null;
+		if (orderId != 0) {
+			map.addAttribute("purchase", purchaseService.getPurchaseById(orderId));
+			page = "PurchaseView";
+		} else {
+			map.addAttribute("purchase", purchaseService.getAllPurchases());
+			page = "PurchaseData";
 
 		}
-
-		return "PurchaseShowPage";
-	}
-	// Show Data
-
-	@RequestMapping("/all")
-	public String showAll(ModelMap map) {
-		List<Purchase> oss = service.getAllPurchases();
-		map.addAttribute("list", oss);
-		return "PurchaseShowDataPage";
+		return page;
 	}
 
 	@RequestMapping("/delete")
-	public String deleteDataById(@RequestParam("id") Integer sid, ModelMap map) {
-		service.deletePurchase(sid);
-		map.addAttribute("list", service.getAllPurchases());
-		map.addAttribute("msg", sid + "Deleted Successfully");
-		return "PurchaseShowDataPage";
+	public String deletePurchase(@RequestParam Integer orderId, ModelMap map) {
+
+		purchaseService.deletePurchase(orderId);
+		map.addAttribute("message", "Purchase deleted successfully with id :" + orderId + " !!");
+		map.addAttribute("purchase", purchaseService.getAllPurchases());
+		return "PurchaseData";
 	}
 
 	@RequestMapping("/edit")
-	public String showEditPage(@RequestParam("id") Integer sid, ModelMap map) {
-		Purchase p = service.getPurchaseById(sid);
-		map.addAttribute("purchase", p);
-		/**INTEGRATION STARTS**/
-		map.addAttribute("ships", shipmentservice.getAllShipmentTypes());
-		map.addAttribute("whusers", whuservice.getAllWhUserTypes());
-		/**INTEGRATION STARTS**/
-		return "PurchaseEditPage";
+	public String editOne(@RequestParam Integer orderId, ModelMap map) {
+		map.addAttribute("purchase", purchaseService.getPurchaseById(orderId));
+		map.addAttribute("whUserType", whUserTypeService.getAllWhUserByType("VENDOR"));
+		map.addAttribute("shipmentType", shipmentTypeService.getEnableShipmentIdsAndCodes());
+		return "PurchaseEdit";
 	}
 
 	@RequestMapping(value = "/update", method = RequestMethod.POST)
-	public String showUpdatePage(@ModelAttribute Purchase purchase, ModelMap map) {
-		service.updatePurchase(purchase);
-		List<Purchase> lst = service.getAllPurchases();
-		map.addAttribute("list", lst);
-		return "PurchaseShowDataPage";
+	public String updatePurchase(@ModelAttribute Purchase purchase, Errors errors, ModelMap map) {
+
+		purchaseService.updatePurchase(purchase);
+		map.addAttribute("purchase", purchaseService.getAllPurchases());
+		return "PurchaseData";
+
 	}
 
-	@RequestMapping("/excel")
-	public ModelAndView showExcelPage(@RequestParam(value = "id", required = false, defaultValue = "0") Integer id) {
-		ModelAndView m = new ModelAndView();
-		m.setView(new PurchaseExcelView());
-		if (id == 0) {
-			m.addObject("list", service.getAllPurchases());
+	@RequestMapping("/excelExport")
+	public ModelAndView excelExport(@RequestParam(required = false, defaultValue = "0") Integer orderId, ModelMap map) {
+		ModelAndView mv = null;
+		if (orderId != 0) {
+			mv = new ModelAndView(new PurchaseExcelView(), "purchase",
+					Arrays.asList(purchaseService.getPurchaseById(orderId)));
 		} else {
-			m.addObject("list", Collections.singletonList(service.getPurchaseById(id)));
+			mv = new ModelAndView(new PurchaseExcelView(), "purchase", purchaseService.getAllPurchases());
+		}
+		return mv;
+	}
+
+	@RequestMapping("/pdfExport")
+	public ModelAndView pdfExport(@RequestParam(required = false, defaultValue = "0") Integer orderId, ModelMap map) {
+		ModelAndView mv = null;
+		if (orderId != 0) {
+			mv = new ModelAndView(new PurchasePdfView(), "purchase",
+					Arrays.asList(purchaseService.getPurchaseById(orderId)));
+		} else {
+			mv = new ModelAndView(new PurchasePdfView(), "purchase", purchaseService.getAllPurchases());
+		}
+		return mv;
+	}
+
+	/***
+	 * Child Operations starts here
+	 */
+
+	private void getDtlUi(Integer orderId, ModelMap map) {
+		Purchase po = purchaseService.getPurchaseById(orderId);
+
+		// PO Code to show as Read Only
+		map.addAttribute("poId", po.getOrdId());
+		map.addAttribute("poCode", po.getOrdCode());
+		map.addAttribute("poStatus", po.getOrdSts());
+
+		/**
+		 * Form Data START
+		 */
+		// new empty form child
+		PurchaseDtl dtl = new PurchaseDtl();
+		dtl.setPoHdrId(po.getOrdId());
+		map.addAttribute("purchaseDtl", dtl);
+
+		// display items drop down
+		Map<Integer, String> itemsMap = itemService.getItemIdNameCode();
+		map.addAttribute("itemsMap", itemsMap);
+		/**
+		 * FORM DATA END
+		 */
+		List<PurchaseDtl> dtls = po.getDetails();
+		if (dtls == null || dtls.isEmpty()) {
+			po.setOrdSts("OPEN");
+			map.addAttribute("poStatus", "OPEN");
+			purchaseService.updatePurchase(po);
+		} else {
+			// adjust slnos
+			int count = 0;
+			for (PurchaseDtl d : dtls) {
+				d.setSlno(++count);
+			}
+		}
+
+		// all added items to show in table
+		map.addAttribute("dtls", dtls);
+
+	}
+
+	/**
+	 * 1. Show Add Items Pages
+	 * 
+	 */
+	@RequestMapping("/viewItems")
+	public String showItemsPage(@RequestParam Integer orderId, ModelMap map) {
+		// complete common setup is provided here
+		getDtlUi(orderId, map);
+		return "PurchaseItems";
+	}
+
+	/**
+	 * 2. Add Items to PO and update status to PICKING (if items count >=1)
+	 * 
+	 */
+	@RequestMapping(value = "/addItem", method = RequestMethod.POST)
+	public String addPoItem(@ModelAttribute PurchaseDtl purchaseDtl, ModelMap map) {
+		// do form validation PurchaseDtlValidator
+
+		// save child data
+		Purchase po = purchaseService.getPurchaseById(purchaseDtl.getPoHdrId());
+		po.setOrdSts("PICKING"); // check here status update
+		po.getDetails().add(purchaseDtl);
+		purchaseService.updatePurchase(po);
+
+		// setup Purchase Items JSP Data
+		getDtlUi(po.getOrdId(), map);
+		return "PurchaseItems";
+	}
+
+	/**
+	 * 3. Delete Item based on dtlId and update status to OPEN if Items Count=0
+	 * 
+	 */
+	@RequestMapping("/removeItem")
+	public String deletePoDtl(@RequestParam Integer orderDtlId, @RequestParam Integer orderId, ModelMap map) {
+		purchaseService.deletePurchaseDtlById(orderDtlId);
+		// setup Purchase Items JSP Data
+		getDtlUi(orderId, map);
+		return "PurchaseItems";
+	}
+
+	/**
+	 * 4. Confirm Order ie chnage status to ORDERED
+	 */
+	@RequestMapping("/updateOrderStatus")
+	public String updateOrderConfirm(@RequestParam Integer orderId, @RequestParam String status, ModelMap map) {
+		Purchase po = purchaseService.getPurchaseById(orderId);
+		po.setOrdSts(status);
+		purchaseService.updatePurchase(po);
+		String page = null;
+		if (status.equals("ORDERED")) {
+			page = "PurchaseItems";
+			getDtlUi(orderId, map);
+		} else {
+			map.addAttribute("purchase", purchaseService.getAllPurchases());
+			page = "PurchaseData";
+		}
+		return page;
+	}
+
+	/**
+	 * 5. Generate Vendor Invoice
+	 */
+	@RequestMapping("/viewInvoice")
+	public ModelAndView generateInvoice(@RequestParam Integer orderId) {
+		Purchase po = purchaseService.getPurchaseById(orderId);
+		ModelAndView m = null;
+		if (po.getOrdSts().equals("INVOICED")) {
+			m = new ModelAndView(new VendorInvoicePdfView(), "po", po);
+		} else {
+			m = new ModelAndView("PurchaseData", "purchase", purchaseService.getAllPurchases());
 		}
 		return m;
-	}
-
-	@RequestMapping("/pdf")
-	public ModelAndView showPdfView(@RequestParam(value = "id", required = false, defaultValue = "0") Integer id) {
-		ModelAndView mm = new ModelAndView();
-		mm.setView(new PurchasePdfView());
-		if (id == 0) {
-			mm.addObject("list", service.getAllPurchases());
-		} else {
-			Purchase pp = service.getPurchaseById(id);
-			mm.addObject("list", Collections.singletonList(pp));
-		}
-		return mm;
-	}
-
-	@RequestMapping("/charts")
-	public String showCharts() {
-		String path = context.getRealPath("/");
-		List<Object[]> list = service.getPurchaseCountByQtyCheck();
-		System.out.println(path);
-		util.generatePie(path, list);
-		util.generatePie(path, list);
-		return "PurchaseChartPage";
-	}
-
-	@RequestMapping("/viewOne")
-	public String getRowOne(@RequestParam Integer id, ModelMap map) {
-		Purchase pr = service.getPurchaseById(id);
-		map.addAttribute("pr", pr);
-		return "PurchaseViewPage";
 	}
 
 }

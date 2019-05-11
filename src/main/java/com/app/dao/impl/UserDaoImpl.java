@@ -12,38 +12,44 @@ import com.app.dao.IUserDao;
 import com.app.model.User;
 
 @Repository
-public class UserDaoImpl implements IUserDao {
+public class UserDaoImpl implements IUserDao{
 
+	// create object fro HibernateTemplate class
 	@Autowired
 	private HibernateTemplate ht;
 
-	public Integer saveUser(User u) {
-		return (Integer) ht.save(u);
+	// saving user in DB table
+	public Integer saveUser(User user) {
+
+		return (Integer) ht.save(user);
 	}
 
-	public void updateUser(User u) {
-		ht.update(u);
+	// update a user details based on userId
+	public void updateUser(User user) {
+
+		ht.update(user);
 	}
 
-	public void deleteUser(Integer id) {
-		User uu = new User();
-		uu.setUseId(id);
-		ht.delete(uu);
+	// delete a user details based on userId
+	public void deleteUser(Integer userId) {
+
+		ht.delete(new User(userId));
 	}
 
-	public User getUserById(Integer id) {
-		User u = ht.get(User.class, id);
-		return u;
+	// get one user user details based on userId
+	public User getUserById(Integer userId) {
+
+		return ht.get(User.class, userId);
 	}
 
+	// get all user user details based on userId
 	public List<User> getAllUsers() {
-		List<User> u = ht.loadAll(User.class);
-		return u;
+
+		return ht.loadAll(User.class);
 	}
 
-	
 	@SuppressWarnings({ "unchecked", "deprecation" })
-	public List<Object[]> getUserCountByMode() {
+	public List<Object[]> getUsersCount() {
 
 		String hql =   "select gender,count(gender) from "
 				+User.class.getCanonicalName()
@@ -53,7 +59,7 @@ public class UserDaoImpl implements IUserDao {
 
 		return users;
 	}
-	
+
 	@SuppressWarnings({ "deprecation", "unchecked" })
 	public boolean isEmailOrMobileExist(String type, String userEmailOrmobile) {
 
@@ -69,23 +75,17 @@ public class UserDaoImpl implements IUserDao {
 		return count>0?true:false;
 	}
 
-	
-	@SuppressWarnings("unchecked")
 	@Override
-	public User findUserByEmail(String username) {
-
-		User user=null; 
-		
-		//select * from usertab where email=?
-		List<User> userList=
-				(List<User>) ht.findByCriteria(
-						DetachedCriteria.forClass(User.class)
-						.add(Restrictions.eq("usrMail", username))
-						);
-		if(userList!=null && !userList.isEmpty()) {
-			user=userList.get(0);
+	@SuppressWarnings("unchecked")
+	public User findByUserEmail(String username) {
+		User user=null;
+		List<User> users=(List<User>) ht.findByCriteria(
+				DetachedCriteria.forClass(User.class)
+				.add(Restrictions.eq("userEmail", username))
+				);
+		if(users!=null && !users.isEmpty()) {
+			user=users.get(0);
 		}
-		
 		return user;
 	}
 }

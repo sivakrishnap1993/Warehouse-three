@@ -1,6 +1,7 @@
 package com.app.service.impl;
 
 import java.util.List;
+import java.util.Map;
 
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
@@ -16,39 +17,48 @@ public class OrderMethodServiceImpl implements IOrderMethodService {
 	@Autowired
 	private IOrderMethodDao dao;
 
-	@Override
 	@Transactional
-	public Integer saveOrderMethod(OrderMethod or) {
-		return dao.saveOrderMethod(or);
+	public Integer saveOrderMethod(OrderMethod orderMethod) {
+		return dao.saveOrderMethod(orderMethod);
 	}
 
-	@Override
 	@Transactional
-	public void updateOrderMethod(OrderMethod or) {
-		dao.updateOrderMethod(or);
+	public void updateOrderMethod(OrderMethod orderMethod) {
+
+		dao.updateOrderMethod(orderMethod);
 	}
 
-	@Override
 	@Transactional
-	public void deleteOrderMethod(Integer id) {
-		dao.deleteOrderMethod(id);
+	public void deleteOrderMethod(Integer orderId) {
+
+		dao.deleteOrderMethod(orderId);
 	}
 
-	@Override
-	@Transactional(readOnly = true)
-	public OrderMethod getOrderMethodById(Integer id) {
-		return dao.getOrderMethodById(id);
+	@Transactional(readOnly=true)
+	public OrderMethod getOrderMethodById(Integer orderId) {
+
+		return dao.getOrderMethodById(orderId);
 	}
 
-	@Override
-	@Transactional(readOnly = true)
+	@Transactional(readOnly=true)
 	public List<OrderMethod> getAllOrderMethods() {
+
 		return dao.getAllOrderMethods();
 	}
+	@Transactional(readOnly=true)
+	public List<Object[]> getOrderModeCount() {
+		
+		return dao.getOrderModeCount();
+	}
 
-	@Transactional(readOnly = true)
-	public List<Object[]> getOrderMethodCountByMode() {
-		return dao.getOrderMethodCountByMode();
+	@Transactional(readOnly=true)
+	public boolean isOrderMethodExist(String orderCode) {
+		return dao.isOrderMethodExist(orderCode);
+	}
+
+	@Transactional(readOnly=true)
+	public Map<Integer, String> getAllOrderMethodIdsAndCodes() {
+		return dao.getAllOrderMethodIdsAndCodes();
 	}
 
 }

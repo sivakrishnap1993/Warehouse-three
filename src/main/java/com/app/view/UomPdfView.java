@@ -1,6 +1,5 @@
 package com.app.view;
 
-import java.util.Date;
 import java.util.List;
 import java.util.Map;
 
@@ -15,48 +14,37 @@ import com.lowagie.text.Paragraph;
 import com.lowagie.text.pdf.PdfPTable;
 import com.lowagie.text.pdf.PdfWriter;
 
-public class UomPdfView extends AbstractPdfView {
+public class UomPdfView extends AbstractPdfView{
 
+	@SuppressWarnings("unchecked")
 	@Override
 	protected void buildPdfDocument(Map<String, Object> model, Document document, PdfWriter writer,
 			HttpServletRequest request, HttpServletResponse response) throws Exception {
 
-		// file Name & Download PDF file
-		response.addHeader("Content-Disposition", "attachment;filename=uom.pdf");
+		//set file name
+		response.setHeader("Content-Disposition", "attachment;filename=Uoms.pdf");
 
-		// read data from model
-		@SuppressWarnings("unchecked")
-		List<Uom> lst = (List<Uom>) model.get("list");
+		//loadind data from model
+		List<Uom> uom=(List<Uom>) model.get("uom");
+		//create any element
+		document.add(new Paragraph("Uom Details"));
 
-		// create One Element
-		Paragraph p = new Paragraph("Welcome To App");
+		// create table
+		PdfPTable pdfPTable=new PdfPTable(4);
+		pdfPTable.addCell("ID");
+		pdfPTable.addCell("TYPE");
+		pdfPTable.addCell("MODEL");
+		pdfPTable.addCell("NOTE");
 
-		// Add Element To Document
+		for(Uom u :uom) {
+			pdfPTable.addCell(u.getUomId().toString());
+			pdfPTable.addCell(u.getUomType());
+			pdfPTable.addCell(u.getUomModel());
+			pdfPTable.addCell(u.getUomDesc());
 
-		document.add(p);
-
-		// Table With Column Count
-		PdfPTable t = new PdfPTable(7);
-		t.addCell("ID");
-		t.addCell("TYPE");
-		t.addCell("CODE");
-		t.addCell("ENABLE");
-		t.addCell("META");
-		t.addCell("SIZE");
-		t.addCell("NOTE");
-
-		// add Data to Table
-		for (Uom u : lst) {
-			t.addCell(u.getUomId().toString());
-			t.addCell(u.getUonType());
-			t.addCell(u.getUomCode());
-			t.addCell(u.getUomEnable());
-			t.addCell(u.getMetaCode());
-			t.addCell(u.getAdjst());
-			t.addCell(u.getNote());
 		}
-		document.add(t);
-		document.add(new Paragraph(new Date().toString()));
-	}
+		document.add(pdfPTable);
 
+	}
 }
+

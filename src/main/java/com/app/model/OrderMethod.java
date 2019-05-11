@@ -2,97 +2,89 @@ package com.app.model;
 
 import java.util.List;
 
+import javax.persistence.Column;
 import javax.persistence.ElementCollection;
 import javax.persistence.Entity;
 import javax.persistence.FetchType;
 import javax.persistence.GeneratedValue;
 import javax.persistence.Id;
+import javax.persistence.JoinColumn;
+import javax.persistence.JoinTable;
+import javax.persistence.OrderColumn;
+import javax.persistence.Table;
+
+import org.hibernate.annotations.GenericGenerator;
 
 @Entity
+@Table(name="ordermethodtab")
 public class OrderMethod {
-
+	
 	@Id
-	@GeneratedValue
-	private Integer ordMId;
-	private String ordMode;
-	private String ordCode;
-	private String ordExType;
+	@GeneratedValue(generator="orderMethod")
+	@GenericGenerator(name="orderMethod",strategy="increment")
+	@Column(name="oid")
+	private Integer orderId;
+	@Column(name="omode")
+	private String orderMode;
+	@Column(name="ocode")
+	private String orderCode;
+	@Column(name="oexetype")
+	private String orderExeType;
 	@ElementCollection(fetch=FetchType.EAGER)
-	private List<String> ordAccept;
-	private String note;
-
+	@JoinTable(name="ordacptab",joinColumns=@JoinColumn(name="oid"))//join column
+	@OrderColumn(name="pos")//index
+	@Column(name="oacpt")//column name
+	private List<String> orderAccept;
+	@Column(name="odesc")
+	private String orderDecs;
 	public OrderMethod() {
 		super();
 	}
-
-	public OrderMethod(Integer ordMId) {
+	public OrderMethod(Integer orderId) {
 		super();
-		this.ordMId = ordMId;
+		this.orderId = orderId;
 	}
-
-	public OrderMethod(Integer ordMId, String ordMode, String ordCode, String ordExType, List<String> ordAccept,
-			String note) {
-		super();
-		this.ordMId = ordMId;
-		this.ordMode = ordMode;
-		this.ordCode = ordCode;
-		this.ordExType = ordExType;
-		this.ordAccept = ordAccept;
-		this.note = note;
+	public Integer getOrderId() {
+		return orderId;
 	}
-
-	public Integer getOrdMId() {
-		return ordMId;
+	public void setOrderId(Integer orderId) {
+		this.orderId = orderId;
 	}
-
-	public void setOrdMId(Integer ordMId) {
-		this.ordMId = ordMId;
+	public String getOrderMode() {
+		return orderMode;
 	}
-
-	public String getOrdMode() {
-		return ordMode;
+	public void setOrderMode(String orderMode) {
+		this.orderMode = orderMode;
 	}
-
-	public void setOrdMode(String ordMode) {
-		this.ordMode = ordMode;
+	public String getOrderCode() {
+		return orderCode;
 	}
-
-	public String getOrdCode() {
-		return ordCode;
+	public void setOrderCode(String orderCode) {
+		this.orderCode = orderCode;
 	}
-
-	public void setOrdCode(String ordCode) {
-		this.ordCode = ordCode;
+	public String getOrderExeType() {
+		return orderExeType;
 	}
-
-	public String getOrdExType() {
-		return ordExType;
+	public void setOrderExeType(String orderExeType) {
+		this.orderExeType = orderExeType;
 	}
-
-	public void setOrdExType(String ordExType) {
-		this.ordExType = ordExType;
+	public List<String> getOrderAccept() {
+		return orderAccept;
 	}
-
-	public List<String> getOrdAccept() {
-		return ordAccept;
+	public void setOrderAccept(List<String> orderAccept) {
+		this.orderAccept = orderAccept;
 	}
-
-	public void setOrdAccept(List<String> ordAccept) {
-		this.ordAccept = ordAccept;
+	public String getOrderDecs() {
+		return orderDecs;
 	}
-
-	public String getNote() {
-		return note;
+	public void setOrderDecs(String orderDecs) {
+		this.orderDecs = orderDecs;
 	}
-
-	public void setNote(String note) {
-		this.note = note;
-	}
-
 	@Override
 	public String toString() {
-		return "OrderMethod [ordMId=" + ordMId + ", ordMode=" + ordMode + ", ordCode=" + ordCode + ", ordExType="
-				+ ordExType + ", ordAccept=" + ordAccept + ", note=" + note + "]";
+		return "OrderMethod [orderId=" + orderId + ", orderMode=" + orderMode + ", orderCode=" + orderCode
+				+ ", orderExeType=" + orderExeType + ", orderAccept=" + orderAccept + ", orderDecs=" + orderDecs + "]";
 	}
-
+	
+	
 }

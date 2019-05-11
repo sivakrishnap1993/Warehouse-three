@@ -1,114 +1,107 @@
 package com.app.model;
 
+import javax.persistence.Column;
 import javax.persistence.Entity;
 import javax.persistence.GeneratedValue;
 import javax.persistence.Id;
+import javax.persistence.Table;
+
+import org.hibernate.annotations.GenericGenerator;
 
 @Entity
+@Table(name="wh_USER_type_tab")
 public class WhUserType {
-
+	
 	@Id
-	@GeneratedValue
-	private Integer urdId;
-	private String userOneType;
-	private String usrCode;
-	private String usrFor;
-	private String usrEmail;
-	private String usrContact;
+	@GeneratedValue(generator="whuser")
+	@GenericGenerator(name="whuser",strategy="increment")
+	@Column(name="whuser_id")
+	private Integer userId;
+	@Column(name="ucode")
+	private String userCode;
+	@Column(name="utype")
 	private String userType;
-	private String usrNum;
-
+	@Column(name="uname")
+	private String userName;
+	@Column(name="ufor")
+	private String userFor;
+	@Column(name="email")
+	private String userEmail;
+	@Column(name="mobile")
+	private String userNumber;
+	@Column(name="idtype")
+	private String userIdType;
+	@Column(name="otherdocu")
+	private String ifOther;
+	@Column(name="idnum")
+	private String userIdNumber;
 	public WhUserType() {
 		super();
 	}
-
-	public WhUserType(Integer urdId) {
+	public WhUserType(Integer userId) {
 		super();
-		this.urdId = urdId;
+		this.userId = userId;
 	}
-
-	public WhUserType(Integer urdId, String userOneType, String usrCode, String usrFor, String usrEmail,
-			String usrContact, String userType, String usrNum) {
-		super();
-		this.urdId = urdId;
-		this.userOneType = userOneType;
-		this.usrCode = usrCode;
-		this.usrFor = usrFor;
-		this.usrEmail = usrEmail;
-		this.usrContact = usrContact;
-		this.userType = userType;
-		this.usrNum = usrNum;
+	public Integer getUserId() {
+		return userId;
 	}
-
-	public Integer getUrdId() {
-		return urdId;
+	public void setUserId(Integer userId) {
+		this.userId = userId;
 	}
-
-	public void setUrdId(Integer urdId) {
-		this.urdId = urdId;
+	public String getUserCode() {
+		return userCode;
 	}
-
-	public String getUserOneType() {
-		return userOneType;
+	public void setUserCode(String userCode) {
+		this.userCode = userCode;
 	}
-
-	public void setUserOneType(String userOneType) {
-		this.userOneType = userOneType;
-	}
-
-	public String getUsrCode() {
-		return usrCode;
-	}
-
-	public void setUsrCode(String usrCode) {
-		this.usrCode = usrCode;
-	}
-
-	public String getUsrFor() {
-		return usrFor;
-	}
-
-	public void setUsrFor(String usrFor) {
-		this.usrFor = usrFor;
-	}
-
-	public String getUsrEmail() {
-		return usrEmail;
-	}
-
-	public void setUsrEmail(String usrEmail) {
-		this.usrEmail = usrEmail;
-	}
-
-	public String getUsrContact() {
-		return usrContact;
-	}
-
-	public void setUsrContact(String usrContact) {
-		this.usrContact = usrContact;
-	}
-
+	
 	public String getUserType() {
 		return userType;
 	}
-
 	public void setUserType(String userType) {
 		this.userType = userType;
 	}
-
-	public String getUsrNum() {
-		return usrNum;
+	public String getUserName() {
+		return userName;
 	}
-
-	public void setUsrNum(String usrNum) {
-		this.usrNum = usrNum;
+	public void setUserName(String userName) {
+		this.userName = userName;
 	}
-
-	@Override
-	public String toString() {
-		return "WhUserType [urdId=" + urdId + ", userOneType=" + userOneType + ", usrCode=" + usrCode + ", usrFor="
-				+ usrFor + ", usrEmail=" + usrEmail + ", usrContact=" + usrContact + ", userType=" + userType
-				+ ", usrNum=" + usrNum + "]";
+	public String getUserFor() {
+		return userFor;
 	}
-
+	public void setUserFor(String userFor) {
+		this.userFor = userFor;
+	}
+	public String getUserEmail() {
+		return userEmail;
+	}
+	public void setUserEmail(String userEmail) {
+		this.userEmail = userEmail;
+	}
+	public String getUserNumber() {
+		return userNumber;
+	}
+	public void setUserNumber(String userNumber) {
+		this.userNumber = userNumber;
+	}
+	public String getUserIdType() {
+		return userIdType;
+	}
+	public void setUserIdType(String userIdType) {
+		this.userIdType = userIdType;
+	}
+	public String getIfOther() {
+		return ifOther;
+	}
+	public void setIfOther(String ifOther) {
+		this.ifOther = ifOther;
+	}
+	public String getUserIdNumber() {
+		return userIdNumber;
+	}
+	public void setUserIdNumber(String userIdNumber) {
+		this.userIdNumber = userIdNumber;
+	}
+	
 }

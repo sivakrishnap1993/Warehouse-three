@@ -18,63 +18,42 @@ import com.app.util.AppCollectionUtil;
 public class WhUserTypeDaoImpl implements IWhUserTypeDao {
 
 	@Autowired
-	private HibernateTemplate ht;
+	private HibernateTemplate ht; 
 
-	@Override
-	public Integer saveWhUserType(WhUserType wh) {
-
-		return (Integer) ht.save(wh);
+	public Integer saveWhUserType(WhUserType whUserType) {
+		return (Integer) ht.save(whUserType);
 	}
-
-	@Override
-	public void updateWhUserType(WhUserType wh) {
-		ht.update(wh);
+	public void updateWhUserType(WhUserType whUserType) {
+		ht.update(whUserType);
 	}
-
-	@Override
-	public void deleteWhUserType(Integer id) {
-		WhUserType w = new WhUserType();
-		w.setUrdId(id);
-		ht.delete(w);
+	public void deleteWhUserType(Integer whUserTypeId) {
+		ht.delete(new WhUserType(whUserTypeId));
 	}
-
-	@Override
-	public WhUserType getWhUserTypeById(Integer id) {
-		WhUserType ww = ht.get(WhUserType.class, id);
-		return ww;
+	public WhUserType getWhUserTypeById(Integer whUserTypeId) {
+		return ht.get(WhUserType.class, whUserTypeId);
 	}
-
-	@Override
 	public List<WhUserType> getAllWhUserTypes() {
-		List<WhUserType> lst = ht.loadAll(WhUserType.class);
-		return lst;
+		return ht.loadAll(WhUserType.class);
 	}
 
 	@SuppressWarnings("unchecked")
-	@Override
-	public List<Object[]> getWhUserTypeCountByMode() {
-		List<Object[]> list=(List<Object[]>)ht.findByCriteria(DetachedCriteria.forClass(WhUserType.class)
-				.setProjection(Projections.projectionList().add(Projections.groupProperty("userType"))
-				.add(Projections.count("userType"))
-				));
-		
-		/*
-		 * String hql = " select userType,count(userType) " + "  from " +
-		 * WhUserType.class.getName() + "  group by userType ";
-		 * 
-		 * @SuppressWarnings({ "unchecked", "deprecation" }) List<Object[]> list =
-		 * (List<Object[]>) ht.find(hql);
-		 */
-		return list;
+	public List<Object[]> getWhUserTypeCount() {
+
+		/*String hql=  " select userFor,count(userFor) from "
+				+ WhUserType.class.getName()
+				+ " group by userFor";*/
+		DetachedCriteria hql=
+				DetachedCriteria.forClass(WhUserType.class)
+				.setProjection(
+						Projections.projectionList()
+						.add(Projections.groupProperty("userFor"))
+						.add(Projections.count("userFor"))
+						);
+		List<Object[]> whUserTypes = (List<Object[]>) ht.findByCriteria(hql);
+
+		return whUserTypes;
 	}
 
-	@SuppressWarnings("unchecked")
-	@Override
-	public List<WhUserType> getWhUsersBasedonType(String type) {
-		List<WhUserType> list=(List<WhUserType>)ht.findByCriteria(DetachedCriteria.forClass(WhUserType.class).add(Restrictions.eq("userOneType", type)));
-		return list;
-	}
-	
 	@SuppressWarnings("unchecked")
 	public boolean isWhUserCodeExist(String userCode) {
 
@@ -128,6 +107,5 @@ public class WhUserTypeDaoImpl implements IWhUserTypeDao {
 		}
 		return count>0?true:false;
 	}
-
 
 }

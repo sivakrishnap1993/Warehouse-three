@@ -1,6 +1,7 @@
 package com.app.service.impl;
 
 import java.util.List;
+import java.util.Map;
 
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
@@ -15,40 +16,51 @@ public class UomServiceImpl implements IUomService {
 
 	@Autowired
 	private IUomDao dao;
-
-	@Override
+	
 	@Transactional
-	public Integer saveUom(Uom o) {
-		return dao.saveUom(o);
+	public Integer saveUom(Uom uom) {
+		return dao.saveUom(uom);
 	}
 
-	@Override
 	@Transactional
-	public void updateUom(Uom o) {
-		dao.updateUom(o);
+	public void updateUom(Uom uom) {
+
+		dao.updateUom(uom);
 	}
 
-	@Override
 	@Transactional
-	public void deleteUom(Integer id) {
-		dao.deleteUom(id);
+	public void deleteUom(Integer uomId) {
+
+		dao.deleteUom(uomId);
 	}
 
-	@Override
-	@Transactional(readOnly = true)
-	public Uom getUomById(Integer id) {
-		return dao.getUomById(id);
+	@Transactional
+	public Uom getUomById(Integer uomId) {
+
+		return dao.getUomById(uomId);
 	}
 
-	@Override
-	@Transactional(readOnly = true)
+	@Transactional
 	public List<Uom> getAllUoms() {
+
 		return dao.getAllUoms();
 	}
 
-	@Transactional(readOnly = true)
-	public List<Object[]> getUomCountByType() {
-		return  dao.getUomCountByType();
+	@Transactional(readOnly=true)
+	public List<Object[]> getuomTypeCount() {
+
+		return dao.getuomTypeCount();
+	}
+
+	
+	@Transactional(readOnly=true)
+	public boolean isUomExist(String uomModel) {
+		return dao.isUomExist(uomModel);
+	}
+	
+	@Transactional(readOnly=true)
+	public Map<Integer, String> getAllUomIdsAndModels() {
+		return dao.getAllUomIdsAndModels();
 	}
 
 }

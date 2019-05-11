@@ -2,46 +2,61 @@ package com.app.validator;
 
 import java.util.regex.Pattern;
 
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
 import org.springframework.util.StringUtils;
 import org.springframework.validation.Errors;
 import org.springframework.validation.Validator;
 
 import com.app.model.OrderMethod;
+import com.app.service.IOrderMethodService;
 
 @Component
-public class OrderMethodValidator implements Validator {
+public class OrderMethodValidator implements Validator{
+	
+	@Autowired
+	private IOrderMethodService orderMethodService;
 
-	@Override
-	public boolean supports(Class<?> clazz) {
-		return OrderMethod.class.equals(clazz);
+	public boolean supports(Class<?> clz) {
+		return OrderMethod.class.equals(clz);
 	}
 
-	@Override
 	public void validate(Object target, Errors errors) {
-		OrderMethod or = (OrderMethod) target;
 
-		/**** RADIO-BUTTON**ordMode **/
-		if (StringUtils.isEmpty(or.getOrdMode())) {
-			errors.rejectValue("ordMode", null, "Please Enter One Radio Button ");
+		//convert to model class object
+		OrderMethod orderMethod=(OrderMethod)target;
+		
+		//checking radio button empty
+		if(StringUtils.isEmpty(orderMethod.getOrderMode())) {
+			errors.rejectValue("orderMode", null, "please choose atleast one !");
 		}
-		/*** Text Input Validations ***/
-		if (!Pattern.matches("[A-Z]{2,6}", or.getOrdCode())) {
-			errors.rejectValue("ordCode", null, "Please Enter Minimum 2-6 Characters");
+		
+		//checking text empty
+		if (!StringUtils.hasText(orderMethod.getOrderCode().trim())) {
+			errors.rejectValue("orderCode", null, "please enter code !");
+		}else if (!Pattern.matches("[A-Z]{4,6}", orderMethod.getOrderCode())) {
+			errors.rejectValue("orderCode", null, "code shold be 4-6 uppercase lettrs !");
+		}else if (orderMethodService.isOrderMethodExist(orderMethod.getOrderCode())) {
+			errors.rejectValue("orderCode", null, "code is already exist !");
 		}
-		/** DROP-DOWN**ordExType **/
-		if (StringUtils.isEmpty(or.getOrdExType())) {
-			errors.rejectValue("ordExType", null, "Please Enter one Drop Down Value");
+		
+		//checking drop down empty
+		if (StringUtils.isEmpty(orderMethod.getOrderExeType())) {
+			errors.rejectValue("orderExeType", null, "please select any one !");
 		}
-		/** CHECK-BOX**ordAccept**note **/
-		if (or.getOrdAccept() == null || or.getOrdAccept().isEmpty()) {
-			errors.rejectValue("ordAccept", null, "Please Choose The At Least One Check-Box Value");
+		
+		//checking list is empty
+		if (orderMethod.getOrderAccept().isEmpty()||orderMethod.getOrderAccept()==null) {
+			errors.rejectValue("orderAccept", null, "please select atleast one or more!");
 		}
-
-		/** TEXT FIELD VALIDATION **/
-		if (StringUtils.isEmpty(or.getNote())) {
-			errors.rejectValue("note", null, "Please Enter Text Field");
+		
+		//checking text area empty and size
+		if (!StringUtils.hasText(orderMethod.getOrderDecs().trim())) {
+			errors.rejectValue("orderDecs", null, "please enter description!");
+		} else if(orderMethod.getOrderDecs().length()<10 || orderMethod.getOrderDecs().length()>100) {
+			errors.rejectValue("orderDecs", null, "description should be 10-100 characters!");
 		}
+		
 	}
 
 }

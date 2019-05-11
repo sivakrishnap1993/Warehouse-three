@@ -18,82 +18,103 @@ import com.app.model.ShipmentType;
 import com.app.service.IShipmentTypeService;
 
 @RestController
-@RequestMapping("/rest/ship")
+@RequestMapping("/rest/shipment")
 public class ShipmentTypeRestController {
 
 	@Autowired
 	private IShipmentTypeService service;
 
-	@GetMapping("/all")
+	@GetMapping("all")
 	public ResponseEntity<?> getAll() {
-		ResponseEntity<?> resp = null;
 
-		List<ShipmentType> list = service.getAllShipmentTypes();
-		if (list != null && !list.isEmpty()) {
-			resp = new ResponseEntity<List<ShipmentType>>(list, HttpStatus.OK);
+		ResponseEntity<?> responseEntity =null;
+		List<ShipmentType> shipmentTypes=service.getAllShipmentTypes();
+		if (shipmentTypes!=null && !shipmentTypes.isEmpty()) {
+			responseEntity = new ResponseEntity<List<ShipmentType>>(shipmentTypes, HttpStatus.OK);
 		} else {
-			resp = new ResponseEntity<String>("No Data Found", HttpStatus.OK);
+			responseEntity = new ResponseEntity<String>("No data is available", HttpStatus.OK);
+
 		}
 
-		return resp;
+		return responseEntity;
 	}
-
-	@PostMapping("/save")
-	public ResponseEntity<String> saveData(@RequestBody ShipmentType shipmentType) {
-		ResponseEntity<String> resp = null;
-		try {
-			Integer sid = service.saveShipmentType(shipmentType);
-			String body = " Saved With id:" + sid;
-			resp = new ResponseEntity<String>(body, HttpStatus.OK);
+	
+	@GetMapping("/get/{shipmentId}")
+	public ResponseEntity<?> getOne(@PathVariable Integer shipmentId){
+		
+		ResponseEntity<?> responseEntity;
+		ShipmentType shipmentType=service.getShipmentTypeById(shipmentId);
+		
+		if (shipmentType!=null) {
+			responseEntity = new ResponseEntity<ShipmentType>(shipmentType,HttpStatus.OK);
+		} else {
+			responseEntity = new ResponseEntity<String>("Shipment "+shipmentId+" is not avialable", HttpStatus.BAD_REQUEST);
+		}
+		/*try {
+			ShipmentType shipmentType=service.getShipmentTypeById(shipmentId);
+			responseEntity = new ResponseEntity<ShipmentType>(shipmentType,HttpStatus.OK);
 		} catch (Exception e) {
-			resp = new ResponseEntity<String>(e.getMessage(), HttpStatus.INTERNAL_SERVER_ERROR);
+			e.printStackTrace();
+		}*/
+		return responseEntity;
+	}
+	
+	@DeleteMapping("/delete/{shipmentId}")
+	public ResponseEntity<?> deleteOne(@PathVariable Integer shipmentId){
+		
+		ResponseEntity<?> responseEntity;
+		try {
+			service.deleteShipmentType(shipmentId);
+			responseEntity = new ResponseEntity<String>("Shipment "+shipmentId+" is successfully deleted", HttpStatus.OK);
+		} catch (Exception e) {
+			responseEntity = new ResponseEntity<String>("Shipment "+shipmentId+" is not available", HttpStatus.OK);
+
+		}
+		return responseEntity;
+	}
+	
+	@PostMapping("/save")
+	public ResponseEntity<?> save(@RequestBody ShipmentType shipmentType){
+		
+		int shipmenTypetId=service.saveShipmentType(shipmentType);
+		
+		String body="Shipment is saved '"+shipmenTypetId+"'.";
+		ResponseEntity<String> responseEntity=new ResponseEntity<String>(body, HttpStatus.OK);
+		return responseEntity;
+	}
+	
+	@PutMapping("/update")
+	public ResponseEntity<?> update(@RequestBody ShipmentType shipmentType) {
+		
+		ResponseEntity<String> responseEntity=null;
+		try {
+			service.updateShipmentType(shipmentType);
+			responseEntity=new ResponseEntity<String>("ShipmentType "+shipmentType.getShipmentid()+" is updated.", HttpStatus.OK);
+		} catch (Exception e) {
+			
+			responseEntity=new ResponseEntity<String>("ShipmentType "+shipmentType.getShipmentid()+" is not updated.", HttpStatus.BAD_REQUEST);
 			e.printStackTrace();
 		}
-		return resp;
+		return responseEntity;
 	}
-
-	@DeleteMapping("/delete/{sid}")
-	public ResponseEntity<?> getDelete(@PathVariable Integer sid) {
-		ResponseEntity<?> respone = null;
-		try {
-			service.deleteShipmentType(sid);
-			respone = new ResponseEntity<String>(sid + "Deletd Successfully With Id", HttpStatus.OK);
-		} catch (Exception e) {
-			respone = new ResponseEntity<String>(sid + "Deletd Successfully With Id", HttpStatus.BAD_REQUEST);
-		}
-		return respone;
-	}
-
-	@GetMapping("/getOne/{sid}")
-	public ResponseEntity<?> getOneRow(@PathVariable Integer sid) {
-		ResponseEntity<?> resp = null;
-		try {
-			ShipmentType sh = service.getShipmentById(sid);
-			if (sh != null) {
-				resp = new ResponseEntity<ShipmentType>(sh, HttpStatus.OK);
-
-			} else {
-				resp = new ResponseEntity<String>(sid + "Unable To Find In DB", HttpStatus.BAD_REQUEST);
-
-			}
-		} catch (Exception e) {
-			resp = new ResponseEntity<String>(sid + "Cannot To Find In DB", HttpStatus.INTERNAL_SERVER_ERROR);
-		}
-
-		return resp;
-	}
-
-	@PutMapping("/update")
-	public ResponseEntity<?> getUpdateData(@RequestBody ShipmentType shipmentType) {
-		ResponseEntity<?> resp = null;
-		try {
-			service.updateShipementType(shipmentType);
-			resp = new ResponseEntity<String>("Updated Successfully With Id", HttpStatus.OK);
-		} catch (Exception e) {
-			resp = new ResponseEntity<String>("NO Data Found", HttpStatus.INTERNAL_SERVER_ERROR);
-		}
-
-		return resp;
-	}
-
 }
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+

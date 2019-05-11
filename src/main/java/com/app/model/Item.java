@@ -1,48 +1,48 @@
 package com.app.model;
 
+import javax.persistence.Column;
 import javax.persistence.Entity;
 import javax.persistence.GeneratedValue;
 import javax.persistence.Id;
 import javax.persistence.JoinColumn;
 import javax.persistence.ManyToOne;
+import javax.persistence.Table;
+
+import org.hibernate.annotations.GenericGenerator;
 
 @Entity
+@Table(name="item_tab")
 public class Item {
 
 	@Id
-	@GeneratedValue
-
+	@Column(name="item_id")
+	@GeneratedValue(generator="item")
+	@GenericGenerator(name="item",strategy="increment")
 	private Integer itemId;
-
-	private String itmCode;
-
-	private Double itmWidth;
-
-	private Double itemHeight;
-
+	@Column(name="item_code")
+	private String itemCode;
+	@Column(name="item_length")
 	private Double itemLength;
+	@Column(name="item_width")
+	private Double itemWidth;
+	@Column(name="item_height")
+	private Double itemHeight;
+	@Column(name="item_basecost")
+	private Double itemBaseCost;
+	@Column(name="item_currency")
+	private String itemCurrentCurrency;
+	@Column(name="item_desc")
+	private String itemDesc;
 
-	private String baseCost;
-
-	private String baseCurrency;
-
-	private String note;
-
+	// integration with Uom Module
 	@ManyToOne
-	@JoinColumn(name = "uomIdFK")
-	private Uom uom = new Uom();
-
+	@JoinColumn(name="uid")
+	private Uom uom;
+	
+	// integration with OrderMethod Module
 	@ManyToOne
-	@JoinColumn(name = "ordMIdFK")
-	private OrderMethod om = new OrderMethod();
-
-	@ManyToOne
-	@JoinColumn(name = "urdIdFK")
-	private WhUserType wuven = new WhUserType();
-
-	@ManyToOne
-	@JoinColumn(name = "urdIdFK1")
-	private WhUserType wucust = new WhUserType();
+	@JoinColumn(name="orderId")
+	private OrderMethod orderMethod;
 
 	public Item() {
 		super();
@@ -53,23 +53,6 @@ public class Item {
 		this.itemId = itemId;
 	}
 
-	public Item(Integer itemId, String itmCode, Double itmWidth, Double itemHeight, Double itemLength, String baseCost,
-			String baseCurrency, String note, Uom uom, OrderMethod om, WhUserType wuven, WhUserType wucust) {
-		super();
-		this.itemId = itemId;
-		this.itmCode = itmCode;
-		this.itmWidth = itmWidth;
-		this.itemHeight = itemHeight;
-		this.itemLength = itemLength;
-		this.baseCost = baseCost;
-		this.baseCurrency = baseCurrency;
-		this.note = note;
-		this.uom = uom;
-		this.om = om;
-		this.wuven = wuven;
-		this.wucust = wucust;
-	}
-
 	public Integer getItemId() {
 		return itemId;
 	}
@@ -78,28 +61,12 @@ public class Item {
 		this.itemId = itemId;
 	}
 
-	public String getItmCode() {
-		return itmCode;
+	public String getItemCode() {
+		return itemCode;
 	}
 
-	public void setItmCode(String itmCode) {
-		this.itmCode = itmCode;
-	}
-
-	public Double getItmWidth() {
-		return itmWidth;
-	}
-
-	public void setItmWidth(Double itmWidth) {
-		this.itmWidth = itmWidth;
-	}
-
-	public Double getItemHeight() {
-		return itemHeight;
-	}
-
-	public void setItemHeight(Double itemHeight) {
-		this.itemHeight = itemHeight;
+	public void setItemCode(String itemCode) {
+		this.itemCode = itemCode;
 	}
 
 	public Double getItemLength() {
@@ -110,28 +77,44 @@ public class Item {
 		this.itemLength = itemLength;
 	}
 
-	public String getBaseCost() {
-		return baseCost;
+	public Double getItemWidth() {
+		return itemWidth;
 	}
 
-	public void setBaseCost(String baseCost) {
-		this.baseCost = baseCost;
+	public void setItemWidth(Double itemWidth) {
+		this.itemWidth = itemWidth;
 	}
 
-	public String getBaseCurrency() {
-		return baseCurrency;
+	public Double getItemHeight() {
+		return itemHeight;
 	}
 
-	public void setBaseCurrency(String baseCurrency) {
-		this.baseCurrency = baseCurrency;
+	public void setItemHeight(Double itemHeight) {
+		this.itemHeight = itemHeight;
 	}
 
-	public String getNote() {
-		return note;
+	public Double getItemBaseCost() {
+		return itemBaseCost;
 	}
 
-	public void setNote(String note) {
-		this.note = note;
+	public void setItemBaseCost(Double itemBaseCost) {
+		this.itemBaseCost = itemBaseCost;
+	}
+
+	public String getItemCurrentCurrency() {
+		return itemCurrentCurrency;
+	}
+
+	public void setItemCurrentCurrency(String itemCurrentCurrency) {
+		this.itemCurrentCurrency = itemCurrentCurrency;
+	}
+
+	public String getItemDesc() {
+		return itemDesc;
+	}
+
+	public void setItemDesc(String itemDesc) {
+		this.itemDesc = itemDesc;
 	}
 
 	public Uom getUom() {
@@ -142,36 +125,13 @@ public class Item {
 		this.uom = uom;
 	}
 
-	public OrderMethod getOm() {
-		return om;
+	public OrderMethod getOrderMethod() {
+		return orderMethod;
 	}
 
-	public void setOm(OrderMethod om) {
-		this.om = om;
+	public void setOrderMethod(OrderMethod orderMethod) {
+		this.orderMethod = orderMethod;
 	}
 
-	public WhUserType getWuven() {
-		return wuven;
-	}
-
-	public void setWuven(WhUserType wuven) {
-		this.wuven = wuven;
-	}
-
-	public WhUserType getWucust() {
-		return wucust;
-	}
-
-	public void setWucust(WhUserType wucust) {
-		this.wucust = wucust;
-	}
-
-	@Override
-	public String toString() {
-		return "Item [itemId=" + itemId + ", itmCode=" + itmCode + ", itmWidth=" + itmWidth + ", itemHeight="
-				+ itemHeight + ", itemLength=" + itemLength + ", baseCost=" + baseCost + ", baseCurrency="
-				+ baseCurrency + ", note=" + note + ", uom=" + uom + ", om=" + om + ", wuven=" + wuven + ", wucust="
-				+ wucust + "]";
-	}
-
+	
 }

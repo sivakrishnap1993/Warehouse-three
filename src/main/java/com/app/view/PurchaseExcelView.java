@@ -61,7 +61,7 @@ public class PurchaseExcelView extends AbstractXlsView {
 			rr.createCell(5).setCellValue(p.getQtyCk());
 			rr.createCell(6).setCellValue(p.getOrdSts());
 			rr.createCell(7).setCellValue(p.getShip().getShipmentCode());
-			rr.createCell(8).setCellValue(p.getVenwhuser().getUsrCode());
+			rr.createCell(8).setCellValue(p.getVenwhuser().getUserCode());
 			rr.createCell(9).setCellValue(p.getNode());
 		}
 	}

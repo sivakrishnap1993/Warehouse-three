@@ -7,45 +7,44 @@ import java.util.List;
 import org.jfree.chart.ChartFactory;
 import org.jfree.chart.ChartUtils;
 import org.jfree.chart.JFreeChart;
-import org.jfree.chart.plot.PlotOrientation;
 import org.jfree.data.category.DefaultCategoryDataset;
 import org.jfree.data.general.DefaultPieDataset;
 import org.springframework.stereotype.Component;
 
 @Component
 public class UomUtil {
+	public void generatePieChart(String path,List<Object[]> uomTypes) {
 
-	public void generatePie(String path, List<Object[]> data) {
-
-		// data should be converted to DataSet
-		DefaultPieDataset dataset = new DefaultPieDataset();
-		for (Object[] ob : data) {
-			dataset.setValue(ob[0].toString(), new Double(ob[1].toString()));
+		//1.Create data set
+		DefaultPieDataset dataSet = new DefaultPieDataset();
+		for(Object[] d:uomTypes) {
+			dataSet.setValue(d[0].toString(), new Double(d[1].toString()));
 		}
 
-		// Data-set should be converted to JFreeChart
-		// using ChartFactory
-		JFreeChart chart = ChartFactory.createPieChart3D("Uom Type Pi Chart", dataset, true, true, false);
+		//2.converting data to JFreeChart
+		JFreeChart jFreeChart=ChartFactory.createPieChart3D("UOM Pie Chart", dataSet, true, true, false);
 
-		// JFreeChart should be converted to Image
-		// using ChartUtils
+		//3.save image as JPEG
 		try {
-			ChartUtils.saveChartAsJPEG(new File(path + "/resources/images/uom.jpg"), chart, 400, 400);
+			ChartUtils.saveChartAsJPEG(new File(path+"/resources/images/UomTypepie.jpg"), jFreeChart, 250, 250);
 		} catch (IOException e) {
 			e.printStackTrace();
 		}
-		// 1.DATASET
-		DefaultCategoryDataset datset = new DefaultCategoryDataset();
-		for (Object[] ob : data) {
-			datset.setValue(new Double(ob[1].toString()), ob[0].toString(), path);
-		}
-		// 2.JFREECHART USING CHART FACTORY
-		JFreeChart chartt = ChartFactory.createBarChart("Uom Bar Chart Reports", "Mode", "Chart", datset,
-				PlotOrientation.VERTICAL, true, true, false);
 
-		// 3.ChartUtils using to save file as image
+	}
+
+
+	public void generateBarChart(String path,List<Object[]> uomTypes) {
+
+		DefaultCategoryDataset dataset = new DefaultCategoryDataset();
+		for(Object[] d: uomTypes) {
+			dataset.setValue(new Double(d[1].toString()), d[0].toString(), "");
+		}
+
+		JFreeChart jFreeChart=ChartFactory.createBarChart("UOM Bar Chart", "Order Mode", "Count", dataset);
+
 		try {
-			ChartUtils.saveChartAsJPEG(new File(path + "/resources/images/uomm.jpg "), chartt, 400, 400);
+			ChartUtils.saveChartAsJPEG(new File(path+"/resources/images/UomTypebar.jpg"), jFreeChart, 250, 250);
 		} catch (IOException e) {
 			e.printStackTrace();
 		}

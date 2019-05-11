@@ -1,6 +1,5 @@
 package com.app.view;
 
-import java.util.Date;
 import java.util.List;
 import java.util.Map;
 
@@ -15,44 +14,42 @@ import com.lowagie.text.Paragraph;
 import com.lowagie.text.pdf.PdfPTable;
 import com.lowagie.text.pdf.PdfWriter;
 
-public class UserPdfView extends AbstractPdfView {
+public class UserPdfView extends AbstractPdfView{
 
+	@SuppressWarnings("unchecked")
 	@Override
 	protected void buildPdfDocument(Map<String, Object> model, Document document, PdfWriter writer,
 			HttpServletRequest request, HttpServletResponse response) throws Exception {
 
-		// Change File Name
-		response.addHeader("Content-Disposition", "attachment;filename=user.pdf");
+		//set file name
+				response.setHeader("Content-Disposition", "attachment;filename=User.pdf");
 
-		// Data get From The Model
-		@SuppressWarnings("unchecked")
-		List<User> list =  (List<User>) model.get("list");
+				//loadind data from model
+				List<User> user=(List<User>) model.get("user");
+				//create any element
+				document.add(new Paragraph("User Details"));
 
-		Paragraph p = new Paragraph("Welcome To Usee Page");
+				// create table
+				PdfPTable pdfPTable=new PdfPTable(7);
+				pdfPTable.addCell("ID");
+				pdfPTable.addCell("NAME");
+				pdfPTable.addCell("GENDER");
+				pdfPTable.addCell("EMAIL");
+				pdfPTable.addCell("MOBILE");
+				pdfPTable.addCell("PASSWORD");
+				pdfPTable.addCell("ROLES");
 
-		// Add Document to Value
-		document.add(p);
+				for(User u :user) {
+					pdfPTable.addCell(u.getUserId().toString());
+					pdfPTable.addCell(u.getUserName());
+					pdfPTable.addCell(u.getGender());
+					pdfPTable.addCell(u.getUserEmail());
+					pdfPTable.addCell(u.getUserMobile());
+					pdfPTable.addCell(u.getUserPassword());
+					pdfPTable.addCell(u.getUserRoles()!=null?u.getUserRoles().toString():"[]");
 
-		PdfPTable t = new PdfPTable(5);
-		t.addCell("ID");
-		t.addCell("NAME");
-		t.addCell("GENDER");
-		t.addCell("EMAIL");
-		t.addCell("MOBILE");
-		t.addCell("PWD");
-		t.addCell("ROLES");
+				}
+				document.add(pdfPTable);
 
-		for (User u : list) {
-			t.addCell(u.getUseId().toString());
-			t.addCell(u.getUsrName());
-			t.addCell(u.getGender());
-			t.addCell(u.getUsrMail());
-			t.addCell(u.getUserMobile());
-			t.addCell(u.getUsrPwd());
-			t.addCell(u.getUsrRoles().toString());
-		}
-		document.add(t);
-		document.add(new Paragraph(new Date().toString()));
+			}
 	}
-
-}

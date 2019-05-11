@@ -1,6 +1,7 @@
 package com.app.service.impl;
 
 import java.util.List;
+import java.util.Map;
 
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
@@ -17,33 +18,39 @@ public class ItemServiceImpl implements IItemService {
 	private IItemDao dao;
 
 	@Transactional
-	public Integer saveItem(Item i) {
-		return dao.saveItem(i);
+	public Integer saveItem(Item item) {
+		return dao.saveItem(item);
 	}
 
 	@Transactional
-	public void updateItem(Item i) {
-		dao.updateItem(i);
+	public void updateItem(Item item) {
+		dao.updateItem(item);
+
 	}
 
-	@Transactional
-	public void deleteItem(Integer id) {
-		dao.deleteItem(id);
+	@Transactional	
+	public void deleteItem(Integer itemId) {
+		dao.deleteItem(itemId);
 	}
 
-	@Transactional(readOnly = true)
-	public Item getItemById(Integer id) {
-		return dao.getItemById(id);
+
+	@Transactional(readOnly=true)
+	public Item getItemById(Integer itemId) {
+		return dao.getItemById(itemId);
 	}
 
-	@Transactional(readOnly = true)
+	@Transactional(readOnly=true)
 	public List<Item> getAllItems() {
 		return dao.getAllItems();
 	}
 
-	@Transactional(readOnly = true)
-	public List<Object[]> getCountByMode() {
-		return dao.getCountByMode();
+	@Transactional(readOnly=true)
+	public boolean isItemCodeExist(String itemCode) {
+		return dao.isItemCodeExist(itemCode);
 	}
 
+	@Transactional(readOnly=true)
+	public Map<Integer, String> getItemIdNameCode() {
+		return dao.getItemIdNameCode();
+	}
 }

@@ -30,7 +30,7 @@ public class ShipmentTypeUtil {
 		// JFreeChart should be converted to Image
 		// using ChartUtils
 		try {
-			ChartUtils.saveChartAsJPEG(new File(path + "/resources/images/shipmentA.jpg"), chart, 400, 400);
+			ChartUtils.saveChartAsJPEG(new File(path + "/resources/images/shipmentpie.jpg"), chart, 400, 400);
 		} catch (IOException e) {
 			e.printStackTrace();
 		}	
@@ -44,7 +44,7 @@ public class ShipmentTypeUtil {
 				
 				//3. ChartUtils save as Image
 				try {
-					ChartUtils.saveChartAsJPEG(new File(path + "/resources/images/shipmentB.jpg " ), cchart, 400, 400);
+					ChartUtils.saveChartAsJPEG(new File(path + "/resources/images/shipmentbar.jpg" ), cchart, 400, 400);
 				}catch(IOException e) {
 					e.printStackTrace();
 				}

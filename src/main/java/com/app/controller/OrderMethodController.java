@@ -1,6 +1,6 @@
 package com.app.controller;
 
-import java.util.Collections;
+import java.util.Arrays;
 import java.util.List;
 
 import javax.servlet.ServletContext;
@@ -23,113 +23,188 @@ import com.app.view.OrderMethodExcelView;
 import com.app.view.OrderMethodPdfView;
 
 @Controller
-@RequestMapping("/ordermethod")
+@RequestMapping("/order")
 public class OrderMethodController {
 
 	@Autowired
 	private IOrderMethodService service;
-
 	@Autowired
-	private ServletContext context;
-
+	private ServletContext servletContext;
 	@Autowired
-	private OrderMethodUtil util;
-
+	private OrderMethodUtil orderMethodUtil;
 	@Autowired
 	private OrderMethodValidator validator;
 
-	@RequestMapping("/show")
-	public String showPage(ModelMap map) {
+	// 1.Show Register Page
+	@RequestMapping("/register")
+	public String showReg(ModelMap map) {
 		map.addAttribute("orderMethod", new OrderMethod());
-		return "OrderMethodShowPage";
+		return "OrderMehodRegister";
 	}
 
-	@RequestMapping(value = "/save", method = RequestMethod.POST)
-	public String showRegPage(@ModelAttribute OrderMethod orderMethod, Errors errors, ModelMap map) {
+	// 2.Insert Data in DB
+	@RequestMapping(value="/insert",method=RequestMethod.POST)
+	public String save(@ModelAttribute OrderMethod orderMethod,Errors errors,ModelMap map) {
 
-		// CALL VALIDATION
+		//call validate method
 		validator.validate(orderMethod, errors);
-
-		if (!errors.hasErrors()) {
-			Integer id = service.saveOrderMethod(orderMethod);
-			map.addAttribute("clg", "Order Is'" + id + "' Saved Successfully ");
+		
+		//check for errors
+		if (errors.hasErrors()) {
+			map.addAttribute("message", "Please fill all fields !");
+		} else {
+			//save data in DB and send message to UI
+			map.addAttribute("message", "OderMethod saved with Id :"+service.saveOrderMethod(orderMethod));
+			//clean form
 			map.addAttribute("orderMethod", new OrderMethod());
-		} else {
-			map.addAttribute("clg", "Please Check Error");
 		}
-		return "OrderMethodShowPage";
+		
+		return "OrderMehodRegister";
 	}
 
-	@RequestMapping("/all")
-	public String showOrderPage(ModelMap map) {
-		List<OrderMethod> ls = service.getAllOrderMethods();
-		map.addAttribute("list", ls);
-		return "OrderMethodDataPage";
-	}
+	/*// 3.View All Records
+	@RequestMapping("/viewAll")
+	public String vewAll(ModelMap map) {
+		List<OrderMethod> allOrderMethods=service.getAllOrderMethods();
+		map.addAttribute("orderMethods", allOrderMethods);
+		return "OrderMethodData";
+	}*/
 
+	// 4.Delete Record
 	@RequestMapping("/delete")
-	public String deleteDataById(@RequestParam("id") Integer sid, ModelMap map) {
-		service.deleteOrderMethod(sid);
-		map.addAttribute("list", service.getAllOrderMethods());
-		map.addAttribute("msg", sid + "Deleted Successfully");
-		return "OrderMethodDataPage";
-	}
-
-	@RequestMapping("/edit")
-	public String showEditPage(@RequestParam("id") Integer sid, ModelMap map) {
-		OrderMethod e = service.getOrderMethodById(sid);
-		map.addAttribute("orderMethod", e);
-		return "OrderMethodEditPage";
-	}
-
-	@RequestMapping(value = "/update", method = RequestMethod.POST)
-	public String showUpdatePage(@ModelAttribute OrderMethod orderMethod, ModelMap map) {
-		service.updateOrderMethod(orderMethod);
-		List<OrderMethod> em = service.getAllOrderMethods();
-		map.addAttribute("list", em);
-		return "OrderMethodDataPage";
-	}
-
-	@RequestMapping("/excel")
-	public ModelAndView showExcelPage(@RequestParam(value = "id", required = false, defaultValue = "0") Integer id) {
-		ModelAndView m = new ModelAndView();
-		m.setView(new OrderMethodExcelView());
-		if (id == 0) {
-			m.addObject("list", service.getAllOrderMethods());
-		} else {
-			m.addObject("list", Collections.singletonList(service.getOrderMethodById(id)));
-		}
-		return m;
-	}
-
-	@RequestMapping("/pdf")
-	public ModelAndView showPdfPage(@RequestParam(value = "id", required = false, defaultValue = "0") Integer id) {
-		ModelAndView mm = new ModelAndView();
-		mm.setView(new OrderMethodPdfView());
-		if (id == 0) {
-			mm.addObject("list", service.getAllOrderMethods());
-		} else {
-			OrderMethod a = service.getOrderMethodById(id);
-			mm.addObject("list", Collections.singletonList(a));
+	public String delete(@RequestParam Integer orderId,ModelMap map) {
+		
+		try {
+			//delete row
+			service.deleteOrderMethod(orderId);
+			map.addAttribute("message", "Oreder Method Details are deleted with Id : "+orderId);
+		} catch (Exception e) {
+			map.addAttribute("message", "No Details found with Id : "+orderId);
 		}
 
-		return mm;
+		//read data
+		List<OrderMethod> allOrderMethods=service.getAllOrderMethods();
+		map.addAttribute("orderMethod", allOrderMethods);
+		return "OrderMethodData";	
 	}
-	@RequestMapping("/charts")
-	public String showCharts() {
-		String path=context.getRealPath("/");
-		List<Object[]> list=service.getOrderMethodCountByMode();
-		util.genereatePie(path, list);
-		util.genereatePie(path, list);
-		return "OrderMethodReports" ;
-	}
-	
 
+	/*// 5. View One Row or Object
 	@RequestMapping("/viewOne")
-	public String getRowOne(@RequestParam Integer id, ModelMap map) {
-		OrderMethod orm = service.getOrderMethodById(id);
-		map.addAttribute("md", orm);
-		return "OrderMethodViewPage";
+	public String viewOneObject(@RequestParam Integer orderId,ModelMap map) {
+
+		//call service and send to ui
+		map.addAttribute("orderMethod", service.getOrderMethodById(orderId));
+		return "OrderMethodView";
+	}*/
+	
+	// 5.View One Row or object
+		@RequestMapping("/view")
+		public String view(@RequestParam(required=false,defaultValue="0") Integer orderId,ModelMap map) {
+			
+			String page=null;
+			if (orderId!=0) {
+				map.addAttribute("orderMethod", service.getOrderMethodById(orderId));
+				page = "OrderMethodView";
+			} else {
+				map.addAttribute("orderMethod", service.getAllOrderMethods());
+				page = "OrderMethodData";
+			}
+			
+			return page;
+		}
+
+	// 6.Show edit page
+	@RequestMapping("/editOne")
+	public String showEdit(@RequestParam Integer orderId,ModelMap map) {
+		//get one object and send to ui
+		map.addAttribute("orderMethod", service.getOrderMethodById(orderId));
+		return "OrderMethodEdit";
+	}
+
+	// 7.Do update
+	@RequestMapping(value="/update",method=RequestMethod.POST)
+	public String doUpdate(@ModelAttribute OrderMethod orderMethod,ModelMap map) {
+
+		//call service to update
+		service.updateOrderMethod(orderMethod);;
+		map.addAttribute("message", "Order is successfully updated");
+		//grt new data
+		map.addAttribute("orderMethods", service.getAllOrderMethods());
+		//return data.jsp
+		return "OrderMethodData";
+	}
+
+	/*// 8.do excell export
+	@RequestMapping("/excelExport")
+	public ModelAndView doExcelExport() {
+
+		// load data from DB
+		List<OrderMethod> orderMethod=service.getAllOrderMethods();
+
+		// set view,key&value
+		return new ModelAndView(new OrderMethodExcelView(),"orderMethod",orderMethod);
+	}
+
+	// 9.do one excel export
+	@RequestMapping("/excelExportOne")
+	public ModelAndView doOneExcelExport(@RequestParam Integer orderId) {
+
+		//load data from db
+		OrderMethod orderMethod=service.getOrderMethodById(orderId);
+
+		// set view,key&value
+		return new ModelAndView(new OrderMethodExcelView(),"orderMethod",Arrays.asList(orderMethod));
+
+	}*/
+
+	// 8.do excell export
+	@RequestMapping("/excelExport")
+	public ModelAndView excelExport(@RequestParam(required=false,defaultValue="0") Integer orderId) {
+
+		if (orderId!=0) {
+
+			return new ModelAndView(new OrderMethodExcelView(),"orderMethod",Arrays.asList(service.getOrderMethodById(orderId)));
+		} else {
+
+			return new ModelAndView(new OrderMethodExcelView(),"orderMethod",service.getAllOrderMethods());
+		}
+	}
+
+	/*//10. export all rows to pdf
+	@RequestMapping("/pdfExport")
+	public ModelAndView doPdfExport() {
+		return new ModelAndView(new OrderMethodPdfView(),"orderMethod",service.getAllOrderMethods());
+	}
+
+	//11.export all rows to pdf
+	@RequestMapping("/exportPdfOne")
+	public ModelAndView doOnePdfExport(@RequestParam Integer orderId) {
+		return new ModelAndView(new OrderMethodPdfView(),"orderMethod",Arrays.asList(service.getOrderMethodById(orderId)));
+	}*/
+
+	// 9.do PDF export
+	@RequestMapping("/pdfExport")
+	public ModelAndView pdfExport(@RequestParam(required=false,defaultValue="0") Integer orderId) {
+
+		if (orderId!=0) {
+
+			return new ModelAndView(new OrderMethodPdfView(),"orderMethod",Arrays.asList(service.getOrderMethodById(orderId)));
+		} else {
+
+			return new ModelAndView(new OrderMethodPdfView(),"orderMethod",service.getAllOrderMethods());
+		}
+	}
+
+	//10.generate pie chart
+	@RequestMapping("/report")
+	public String pieChart() {
+
+		String path = servletContext.getRealPath("/");
+		List<Object[]> orderModes=service.getOrderModeCount();
+		orderMethodUtil.genereatePie(path, orderModes);
+		orderMethodUtil.genereatePie(path, orderModes);
+
+		return "OrderMethodReport";
 	}
 
 }

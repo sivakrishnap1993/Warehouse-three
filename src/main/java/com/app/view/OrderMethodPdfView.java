@@ -46,12 +46,12 @@ public class OrderMethodPdfView extends AbstractPdfView {
 
 		// add Data to Table
 		for (OrderMethod u : lst) {
-			t.addCell(u.getOrdMId().toString());
-			t.addCell(u.getOrdMode());
-			t.addCell(u.getOrdCode());
-			t.addCell(u.getOrdExType());
-			t.addCell(u.getOrdAccept().toString());
-			t.addCell(u.getNote());
+			t.addCell(u.getOrderId().toString());
+			t.addCell(u.getOrderMode());
+			t.addCell(u.getOrderCode());
+			t.addCell(u.getOrderExeType());
+			t.addCell(u.getOrderAccept().toString());
+			t.addCell(u.getOrderDecs());
 
 		}
 		document.add(t);
